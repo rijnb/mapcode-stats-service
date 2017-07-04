@@ -18,6 +18,7 @@ package com.mapcode.stats;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
+import com.mapcode.stats.analytics.AnalyticsEngine;
 import com.mapcode.stats.implementation.StatsResourceImpl;
 import com.mapcode.stats.implementation.RootResourceImpl;
 
@@ -45,5 +46,8 @@ public class ResourcesModule implements Module {
         // Bind APIs to their implementation.
         binder.bind(RootResource.class).to(RootResourceImpl.class).in(Singleton.class);
         binder.bind(StatsResource.class).to(StatsResourceImpl.class).in(Singleton.class);
+
+        // Bind analytics engine.
+        binder.bind(AnalyticsEngine.class).in(Singleton.class);
     }
 }
