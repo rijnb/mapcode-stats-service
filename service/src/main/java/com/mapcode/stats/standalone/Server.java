@@ -17,8 +17,8 @@
 package com.mapcode.stats.standalone;
 
 import com.google.inject.Inject;
-import com.mapcode.stats.implementation.StatsResourceImpl;
 import com.mapcode.stats.implementation.RootResourceImpl;
+import com.mapcode.stats.implementation.StatsResourceImpl;
 import com.tomtom.speedtools.maven.MavenProperties;
 import com.tomtom.speedtools.rest.Reactor;
 import com.tomtom.speedtools.rest.ResourceProcessor;
@@ -43,6 +43,7 @@ public class Server {
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
     private final MavenProperties mavenProperties;
+    private boolean started = false;
     private final TJWSEmbeddedJaxrsServer server;
 
     @Inject
@@ -51,7 +52,8 @@ public class Server {
         server = new TJWSEmbeddedJaxrsServer();
     }
 
-    public void startServer(final int port) {
+    public synchronized void startServer(final int port) {
+        stopServer();
         server.setPort(port);
 
         /**
@@ -120,11 +122,15 @@ public class Server {
         providerFactory.registerProvider(CacheControlFeature.class, true);
         providerFactory.registerProvider(ResteasyJackson2Provider.class, true);
 
+        started = true;
         LOG.debug("Server: server is ready");
     }
 
-    public void stopServer() {
-        LOG.debug("Server: stop server...");
-        server.stop();
+    public synchronized void stopServer() {
+        LOG.debug("Server: stop server, started={}", started);
+        if (started) {
+            server.stop();
+            started = false;
+        }
     }
 }
