@@ -47,41 +47,10 @@ public class ApiOthersTest {
     }
 
     @Test
-    public void checkStatusXmlJson() {
-        LOG.info("checkStatusXmlJson");
-        Response request = new ResteasyClientBuilder().build().
-                target(server.url("/mapcode/status")).
-                request().
-                get();
-        Assert.assertNotNull(request);
-        int status = request.getStatus();
-        LOG.info("status = {}", status);
-        Assert.assertEquals(200, status);
-
-        request = new ResteasyClientBuilder().build().
-                target(server.url("/mapcode/xml/status")).
-                request().
-                get();
-        Assert.assertNotNull(request);
-        status = request.getStatus();
-        LOG.info("status = {}", status);
-        Assert.assertEquals(200, status);
-
-        request = new ResteasyClientBuilder().build().
-                target(server.url("/mapcode/json/status")).
-                request().
-                get();
-        Assert.assertNotNull(request);
-        status = request.getStatus();
-        LOG.info("status = {}", status);
-        Assert.assertEquals(200, status);
-    }
-
-    @Test
     public void getHelp() {
         LOG.info("getHelp");
         final Response r = new ResteasyClientBuilder().build().
-                target(server.url("/mapcode")).
+                target(server.url("/stats")).
                 request().
                 get();
         Assert.assertNotNull(r);
@@ -95,7 +64,7 @@ public class ApiOthersTest {
     public void checkVersionJson() {
         LOG.info("checkVersionJson");
         final Response response = new ResteasyClientBuilder().build().
-                target(server.url("/mapcode/version")).
+                target(server.url("/stats/version")).
                 request().
                 accept(MediaType.APPLICATION_JSON).get();
         Assert.assertNotNull(response);
@@ -106,51 +75,5 @@ public class ApiOthersTest {
         final VersionDTO x = new Gson().fromJson(s, VersionDTO.class);
         Assert.assertNotNull(x);
         Assert.assertEquals("1.0", x.getVersion());
-    }
-
-    @Test
-    public void checkVersionXmlJson() {
-        LOG.info("checkVersionXmlJson");
-        final String expectedXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><version><version>1.0</version></version>";
-        final String expectedJson = "{\"version\":\"1.0\"}";
-        Response response = new ResteasyClientBuilder().build().
-                target(server.url("/mapcode/version")).
-                request().
-                accept(MediaType.APPLICATION_XML_TYPE).get();
-        Assert.assertNotNull(response);
-        Assert.assertEquals(200, response.getStatus());
-        Assert.assertEquals(expectedXml, response.readEntity(String.class));
-
-        response = new ResteasyClientBuilder().build().
-                target(server.url("/mapcode/xml/version")).
-                request().
-                get();
-        Assert.assertNotNull(response);
-        Assert.assertEquals(200, response.getStatus());
-        Assert.assertEquals(expectedXml, response.readEntity(String.class));
-
-        response = new ResteasyClientBuilder().build().
-                target(server.url("/mapcode/json/version")).
-                request().
-                get();
-        Assert.assertNotNull(response);
-        Assert.assertEquals(200, response.getStatus());
-        Assert.assertEquals(expectedJson, response.readEntity(String.class));
-    }
-
-    @Test
-    public void checkMetrics() {
-        LOG.info("checkMetrics");
-        final Response response = new ResteasyClientBuilder().build().
-                target(server.url("/mapcode/metrics")).
-                request().
-                accept(MediaType.APPLICATION_JSON).get();
-        Assert.assertNotNull(response);
-        Assert.assertEquals(200, response.getStatus());
-        final String s = response.readEntity(String.class);
-        Assert.assertEquals("{\"allMapcodeToLatLonRequests\":{\"calculators\":[{\"totalMetricDuration\":{\"iMillis\":2592000000},\"timeSlotDuration\":{\"iMillis\":86400000},\"values\":[],\"sum\":0.0,\"count\":0,\"sumSquares\":0.0},{\"totalMetricDuration\":{\"iMillis\":604800000},\"timeSlotDuration\":{\"iMillis\":3600000},\"values\":[],\"sum\":0.0,\"count\":0,\"sumSquares\":0.0},{\"totalMetricDuration\":{\"iMillis\":86400000},\"timeSlotDuration\":{\"iMillis\":1800000},\"values\":[],\"sum\":0.0,\"count\":0,\"sumSquares\":0.0},{\"totalMetricDuration\":{\"iMillis\":3600000},\"timeSlo",
-                s.substring(0, 500));
-        Assert.assertEquals("illis\":604800000},\"timeSlotDuration\":{\"iMillis\":3600000},\"values\":[],\"sum\":0.0,\"count\":0,\"sumSquares\":0.0},{\"totalMetricDuration\":{\"iMillis\":86400000},\"timeSlotDuration\":{\"iMillis\":1800000},\"values\":[],\"sum\":0.0,\"count\":0,\"sumSquares\":0.0},{\"totalMetricDuration\":{\"iMillis\":3600000},\"timeSlotDuration\":{\"iMillis\":60000},\"values\":[],\"sum\":0.0,\"count\":0,\"sumSquares\":0.0},{\"totalMetricDuration\":{\"iMillis\":60000},\"timeSlotDuration\":{\"iMillis\":2000},\"values\":[],\"sum\":0.0,\"count\":0,\"sumSquares\":0.0}]}}}",
-                s.substring(s.length() - 500, s.length()));
     }
 }

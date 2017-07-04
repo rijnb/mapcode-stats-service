@@ -65,35 +65,18 @@ public class MainCommandLineTest {
         MainCommandLine.execute(new String[]{"--silent", "--debug", "--port", "8081"});
 
         // Execute a REST API call.
-        checkVersionXmlJson();
+        checkVersion();
 
         MainCommandLine.stop();
     }
 
-    public void checkVersionXmlJson() {
-        LOG.info("checkVersionXmlJson");
-        final String expectedXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><version><version>1.0</version></version>";
+    public void checkVersion() {
+        LOG.info("checkVersion");
         final String expectedJson = "{\"version\":\"1.0\"}";
-        Response response = new ResteasyClientBuilder().build().
-                target(localUrl("/mapcode/version")).
+        final Response response = new ResteasyClientBuilder().build().
+                target(localUrl("/stats/version")).
                 request().
-                accept(MediaType.APPLICATION_XML_TYPE).get();
-        Assert.assertNotNull(response);
-        Assert.assertEquals(200, response.getStatus());
-        Assert.assertEquals(expectedXml, response.readEntity(String.class));
-
-        response = new ResteasyClientBuilder().build().
-                target(localUrl("/mapcode/xml/version")).
-                request().
-                get();
-        Assert.assertNotNull(response);
-        Assert.assertEquals(200, response.getStatus());
-        Assert.assertEquals(expectedXml, response.readEntity(String.class));
-
-        response = new ResteasyClientBuilder().build().
-                target(localUrl("/mapcode/json/version")).
-                request().
-                get();
+                accept(MediaType.APPLICATION_JSON_TYPE).get();
         Assert.assertNotNull(response);
         Assert.assertEquals(200, response.getStatus());
         Assert.assertEquals(expectedJson, response.readEntity(String.class));
