@@ -30,7 +30,7 @@ public final class MapcodeResourceTraceHandler implements Tracer {
     @Nonnull
     private static final Logger LOG = LoggerFactory.getLogger(MapcodeResourceTraceHandler.class);
 
-    private final static DateTime DEFAULT_DATETIME = new DateTime(86400L * 1000 * 365 * 10);    // Epoch + 10 years.
+    private final static DateTime DEFAULT_DATETIME = new DateTime(0L);
 
     // Constructor.
     @Inject

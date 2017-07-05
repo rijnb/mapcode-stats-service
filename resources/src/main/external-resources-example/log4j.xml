@@ -31,6 +31,10 @@
     </logger>
 
     <!-- The SpeedTools framework. -->
+    <logger name="com.tomtom.speedtools.rest">
+        <level value="info"/>
+    </logger>
+
     <logger name="com.tomtom.speedtools">
         <level value="info"/>
     </logger>
