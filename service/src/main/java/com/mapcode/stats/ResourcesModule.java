@@ -20,6 +20,8 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.mapcode.stats.analytics.AnalyticsEngine;
 import com.mapcode.stats.analytics.MapcodeResourceTraceHandler;
+import com.mapcode.stats.analytics.Stats;
+import com.mapcode.stats.analytics.TraceProcessor;
 import com.mapcode.stats.implementation.RootResourceImpl;
 import com.mapcode.stats.implementation.StatsResourceImpl;
 import com.tomtom.speedtools.tracer.TracerFactory;
@@ -30,17 +32,6 @@ import javax.annotation.Nonnull;
 import javax.inject.Singleton;
 
 
-/**
- * This class defines the deployment configuration for Google Guice.
- * <p>
- * The deployment module "bootstraps" the whole Guice injection process.
- * <p>
- * It bootstraps the Guice injection and specifies the property files to be read. It also needs to bind the tracer, so
- * they can be used early on in the app. Finally, it can bind a "startup check" (example provided) as an eager
- * singleton, so the system won't start unless a set of basic preconditions are fulfilled.
- * <p>
- * The "speedtools.default.properties" is required, but its values may be overridden in other property files.
- */
 public class ResourcesModule implements Module {
 
     @Override
@@ -51,15 +42,17 @@ public class ResourcesModule implements Module {
         binder.bind(RootResource.class).to(RootResourceImpl.class).in(Singleton.class);
         binder.bind(StatsResource.class).to(StatsResourceImpl.class).in(Singleton.class);
 
-        // Trace handlers.
-        binder.bind(MapcodeResourceTraceHandler.class).in(com.google.inject.Singleton.class);
-
-        // Bind analytics engine.
-        binder.bind(AnalyticsEngine.class).in(Singleton.class);
-
         // Set tracers.
         TracerFactory.setEnabled(true);
         binder.bind(MongoDBTraceStream.class);
-        binder.bind(MongoDBTraceProperties.class).in(com.google.inject.Singleton.class);
+        binder.bind(MongoDBTraceProperties.class).in(Singleton.class);
+
+        // Trace handlers.
+        binder.bind(MapcodeResourceTraceHandler.class).in(Singleton.class);
+
+        // Bind analytics engine.
+        binder.bind(AnalyticsEngine.class).in(Singleton.class);
+        binder.bind(Stats.class).asEagerSingleton();
+        binder.bind(TraceProcessor.class).asEagerSingleton();
     }
 }

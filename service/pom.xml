@@ -152,6 +152,11 @@
         </dependency>
 
         <dependency>
+            <groupId>net.sf.javaml</groupId>
+            <artifactId>javaml</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
@@ -204,6 +209,33 @@
     </dependencies>
 
     <build>
+        <!-- Maven install plug-in for 3rd party libraries. -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>${maven-install-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>install-external</id>
+                        <phase>clean</phase>
+                        <configuration>
+                            <file>${project.parent.basedir}/lib/javaml-${javaml.version}.jar</file>
+                            <repositoryLayout>default</repositoryLayout>
+                            <groupId>net.sf.javaml</groupId>
+                            <artifactId>javaml</artifactId>
+                            <version>${javaml.version}</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
         <resources>
             <resource>
                 <!-- Let Maven change these files, to enter POM version and such. -->

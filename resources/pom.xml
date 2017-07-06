@@ -28,53 +28,86 @@
 
     <artifactId>resources</artifactId>
     <packaging>jar</packaging>
-    <name>Mapcode REST API Shared Resources</name>
+    <name>Resources</name>
 
     <description>
         Shared resources for Mapcode Stats.
     </description>
-
     <build>
-        <plugins>
-            <!-- Make shared resources. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-remote-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                        <configuration>
-                            <includes>
-                                <include>**/*.properties</include>
-                                <include>**/*.xml</include>
-                            </includes>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-
         <resources>
             <resource>
-                <!-- Let Maven change these files, to enter POM version and such. -->
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
             </resource>
         </resources>
     </build>
 
-    <!-- Test profiles. -->
     <profiles>
+
+        <!-- Test profile. Uses example properties from external-resources-example. -->
         <profile>
-            <id>development</id>
+            <id>test</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/external-resources-example</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                </resources>
+
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-remote-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>bundle</goal>
+                                </goals>
+                                <configuration>
+                                    <includes>
+                                        <include>src/main/external-resources-example/*</include>
+                                    </includes>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Default profile. Uses "real" properties from external-resources. -->
+        <profile>
+            <id>prod</id>
             <build>
                 <resources>
                     <resource>
                         <directory>src/main/external-resources</directory>
+                        <filtering>true</filtering>
                     </resource>
                 </resources>
+
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-remote-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>bundle</goal>
+                                </goals>
+                                <configuration>
+                                    <includes>
+                                        <include>src/main/external-resources/*</include>
+                                    </includes>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
     </profiles>
