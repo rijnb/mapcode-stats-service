@@ -18,9 +18,8 @@ package com.mapcode.stats;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import com.mapcode.stats.analytics.AnalyticsEngine;
 import com.mapcode.stats.analytics.MapcodeResourceTraceHandler;
-import com.mapcode.stats.analytics.Stats;
+import com.mapcode.stats.analytics.StatsEngine;
 import com.mapcode.stats.analytics.TraceProcessor;
 import com.mapcode.stats.implementation.RootResourceImpl;
 import com.mapcode.stats.implementation.StatsResourceImpl;
@@ -51,8 +50,7 @@ public class ResourcesModule implements Module {
         binder.bind(MapcodeResourceTraceHandler.class).in(Singleton.class);
 
         // Bind analytics engine.
-        binder.bind(AnalyticsEngine.class).in(Singleton.class);
-        binder.bind(Stats.class).asEagerSingleton();
+        binder.bind(StatsEngine.class).asEagerSingleton();
         binder.bind(TraceProcessor.class).asEagerSingleton();
     }
 }

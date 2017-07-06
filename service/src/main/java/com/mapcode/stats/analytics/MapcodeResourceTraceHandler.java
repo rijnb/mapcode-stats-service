@@ -19,7 +19,7 @@ package com.mapcode.stats.analytics;
 import com.google.inject.Inject;
 import com.mapcode.*;
 import com.mapcode.services.implementation.MapcodeResourceImpl.Tracer;
-import com.mapcode.stats.analytics.Stats.EventType;
+import com.mapcode.stats.analytics.StatsEngine.EventType;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.mapcode.stats.analytics.Stats.ClientType.*;
+import static com.mapcode.stats.analytics.StatsEngine.ClientType.*;
 
 public final class MapcodeResourceTraceHandler implements Tracer {
     @Nonnull
@@ -35,13 +35,13 @@ public final class MapcodeResourceTraceHandler implements Tracer {
 
     private final static DateTime DEFAULT_DATETIME = new DateTime(0L);
 
-    private final Stats stats;
+    private final StatsEngine statsEngine;
 
     // Constructor.
     @Inject
-    public MapcodeResourceTraceHandler(@Nonnull final Stats stats    ) {
+    public MapcodeResourceTraceHandler(@Nonnull final StatsEngine statsEngine) {
         super();
-        this.stats = stats;
+        this.statsEngine = statsEngine;
     }
 
     @Override
@@ -65,7 +65,7 @@ public final class MapcodeResourceTraceHandler implements Tracer {
                                      @Nullable final String client) {
         LOG.trace("eventLatLonToMapcode: latDeg={}, londeg={}, territory={}, type={}, alphabet={}, include={}, now={}, client={}",
                 latDeg, lonDeg, territory, type, alphabet, include, now, client);
-        stats.addEvent(now, EventType.LAT_LON_TO_MAPCODE, latDeg, lonDeg, fromString(client));
+        statsEngine.addEvent(now, EventType.LAT_LON_TO_MAPCODE, latDeg, lonDeg, fromString(client));
     }
 
     @Override
@@ -92,10 +92,10 @@ public final class MapcodeResourceTraceHandler implements Tracer {
             final String id = mapcodeLong.getCode(8);
             LOG.trace("eventMapcodeToLatLon: latDeg={}, londeg={}, mapcode={}|{}, territory={}, type={}, alphabet={}, include={}, now={}, client={}",
                     point.getLatDeg(), point.getLonDeg(), mapcodeShort, mapcodeLong, territory, now, client);
-            stats.addEvent(now, EventType.MAPCODE_TO_LATLON, point.getLatDeg(), point.getLonDeg(), fromString(client));
+            statsEngine.addEvent(now, EventType.MAPCODE_TO_LATLON, point.getLatDeg(), point.getLonDeg(), fromString(client));
         } catch (final UnknownMapcodeException ignored) {
             LOG.info("eventMapcodeToLatLon: cannot decode mapcode={}, territory={}", code, territory);
-            stats.addEvent(now, EventType.INCORRECT_MAPCODE, 0.0, 0.0, fromString(client));
+            statsEngine.addEvent(now, EventType.INCORRECT_MAPCODE, 0.0, 0.0, fromString(client));
         }
     }
 }

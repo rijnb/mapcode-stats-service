@@ -36,15 +36,22 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-public class Stats {
+public class StatsEngine {
     @Nonnull
-    private static final Logger LOG = LoggerFactory.getLogger(Stats.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StatsEngine.class);
+    private static final FiniteDuration INITIAL_DELAY = FiniteDuration.apply(10, TimeUnit.SECONDS);
+    private static final FiniteDuration SCHEDULE_DELAY = FiniteDuration.apply(20, TimeUnit.SECONDS);
 
     private static final String CLIENT_IOS = "ios";
     private static final String CLIENT_ANDROID = "android";
 
     @Nonnull
     final ActorSystem actorSystem;
+
+    // Collection of events (limited in size).
+    private static final int MAX_EVENTS = 1000 * 1000;
+    @Nonnull
+    final private ArrayList<Event> events = new ArrayList<>(MAX_EVENTS);
 
     public enum EventType {
         LAT_LON_TO_MAPCODE,
@@ -93,24 +100,20 @@ public class Stats {
         }
     }
 
-    // Collection of events (limited in size).
-    private static final int MAX_EVENTS = 1000 * 1000;
-    final private ArrayList<Event> events = new ArrayList<>(MAX_EVENTS);
-
-    public Stats() {
+    public StatsEngine() {
         // Schedule processing.
         this.actorSystem = ActorSystem.create("stats-processor");
-        scheduleNext();
+        scheduleNext(INITIAL_DELAY);
     }
 
     private void processOne() {
         LOG.debug("showClusters...");
         showClusters(10);
-        scheduleNext();
+        scheduleNext(SCHEDULE_DELAY);
     }
 
-    private void scheduleNext() {
-        actorSystem.scheduler().scheduleOnce(FiniteDuration.apply(1, TimeUnit.SECONDS), () -> {
+    private void scheduleNext(@Nonnull  final FiniteDuration duration) {
+        actorSystem.scheduler().scheduleOnce(duration, () -> {
             processOne();
         }, actorSystem.dispatcher());
     }
@@ -122,6 +125,8 @@ public class Stats {
             final double lonDeg,
             @Nonnull final ClientType clientType) {
         LOG.trace("addEvent: eventType={}, latDeg={}, lonDeg={}, clientType={}", eventType, latDeg, lonDeg, clientType);
+
+        // Lock events collection while adding/removing.
         synchronized (events) {
             // Add event.
             final Event event = new Event(now, eventType, latDeg, lonDeg, clientType);
@@ -136,21 +141,27 @@ public class Stats {
 
     public void showClusters(final int nrClusters) {
         LOG.debug("getClusters: nrClusters={}, events={}", nrClusters, events.size());
+
+        // Destination.
+        final Dataset dataset = new DefaultDataset();
+
+        // Lock events collection while copying.
         synchronized (events) {
             if (events.isEmpty()) {
                 return;
             }
-            final Dataset dataset = new DefaultDataset();
             events.stream().forEach((x) -> {
                 final DenseInstance instance = new DenseInstance(new double[]{x.latDeg, x.lonDeg});
                 dataset.add(instance);
             });
-            final Clusterer clusterer = new KMeans(nrClusters);
-            final Dataset[] clusters = clusterer.cluster(dataset);
-            for (int i = 0; i < clusters.length; ++i) {
-                final Dataset cluster = clusters[i];
-                LOG.debug("cluster {}: size={}", i, cluster.size());
-            }
+        }
+
+        // Divide data set into a number of clusters.
+        final Clusterer clusterer = new KMeans(nrClusters);
+        final Dataset[] clusters = clusterer.cluster(dataset);
+        for (int i = 0; i < clusters.length; ++i) {
+            final Dataset cluster = clusters[i];
+            LOG.debug("cluster {}: size={}", i, cluster.size());
         }
     }
 }
