@@ -17,8 +17,9 @@
 package com.mapcode.stats.standalone;
 
 import com.google.inject.Inject;
-import com.mapcode.stats.implementation.RootResourceImpl;
-import com.mapcode.stats.implementation.StatsResourceImpl;
+import com.mapcode.stats.analytics.StatsEngine;
+import com.mapcode.stats.api.implementation.RootResourceImpl;
+import com.mapcode.stats.api.implementation.StatsResourceImpl;
 import com.tomtom.speedtools.maven.MavenProperties;
 import com.tomtom.speedtools.rest.Reactor;
 import com.tomtom.speedtools.rest.ResourceProcessor;
@@ -42,12 +43,16 @@ import java.util.List;
 public class Server {
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
+    private final StatsEngine statsEngine;
     private final MavenProperties mavenProperties;
     private boolean started = false;
     private final TJWSEmbeddedJaxrsServer server;
 
     @Inject
-    public Server(@Nonnull final MavenProperties mavenProperties) {
+    public Server(
+            @Nonnull final StatsEngine statsEngine,
+            @Nonnull final MavenProperties mavenProperties) {
+        this.statsEngine = statsEngine;
         this.mavenProperties = mavenProperties;
         server = new TJWSEmbeddedJaxrsServer();
     }
@@ -85,7 +90,7 @@ public class Server {
         resources.add(new RootResourceImpl(mavenProperties));
 
         // Add mapcode resource.
-        resources.add(new StatsResourceImpl(resourceProcessor));
+        resources.add(new StatsResourceImpl(statsEngine, resourceProcessor));
 
         LOG.debug("Server: start server...");
         server.start();

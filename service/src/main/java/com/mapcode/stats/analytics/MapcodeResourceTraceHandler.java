@@ -19,7 +19,7 @@ package com.mapcode.stats.analytics;
 import com.google.inject.Inject;
 import com.mapcode.*;
 import com.mapcode.services.implementation.MapcodeResourceImpl.Tracer;
-import com.mapcode.stats.analytics.StatsEngine.EventType;
+import com.mapcode.stats.analytics.Event.EventType;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import static com.mapcode.stats.analytics.StatsEngine.ClientType.*;
+import static com.mapcode.stats.analytics.Event.ClientType.fromString;
 
 public final class MapcodeResourceTraceHandler implements Tracer {
     @Nonnull

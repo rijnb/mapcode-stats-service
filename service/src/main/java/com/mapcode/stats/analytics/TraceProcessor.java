@@ -29,7 +29,7 @@ public class TraceProcessor {
     @Nonnull
     private static final Logger LOG = LoggerFactory.getLogger(TraceProcessor.class);
     private static final FiniteDuration INITIAL_DELAY = FiniteDuration.apply(5, TimeUnit.SECONDS);
-    private static final FiniteDuration SCHEDULE_DELAY = FiniteDuration.apply(100, TimeUnit.MILLISECONDS);
+    private static final FiniteDuration SCHEDULE_DELAY = FiniteDuration.apply(10, TimeUnit.MILLISECONDS);
 
     @Nonnull
     final ActorSystem actorSystem;
@@ -39,17 +39,18 @@ public class TraceProcessor {
 
     @Inject
     public TraceProcessor(
+            @Nonnull final ActorSystem actorSystem,
             @Nonnull final MongoDBTraceStream events,
             @Nonnull final MapcodeResourceTraceHandler mapcodeToLatLonTraceHandler) {
         this.events = events;
 
+        // Schedule processing.
+        this.actorSystem = actorSystem;
+
         // Register event handlers.
         this.events.addTraceHandler(mapcodeToLatLonTraceHandler);
 
-        // Schedule processing.
-        this.actorSystem = ActorSystem.create("trace-processor");
-        LOG.debug("TraceProcessor: created actor system to schedule trace processing");
-
+        // Start event processor.
         events.moveToStart();
         scheduleNext(INITIAL_DELAY);
     }

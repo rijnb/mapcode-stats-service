@@ -20,148 +20,114 @@
 
 package com.mapcode.stats.analytics;
 
-import akka.actor.ActorSystem;
+import com.mapcode.stats.analytics.Event.ClientType;
+import com.mapcode.stats.analytics.Event.EventType;
+import com.tomtom.speedtools.geometry.GeoArea;
+import com.tomtom.speedtools.geometry.GeoPoint;
+import com.tomtom.speedtools.geometry.GeoRectangle;
+import com.tomtom.speedtools.time.UTCTime;
 import net.sf.javaml.clustering.Clusterer;
 import net.sf.javaml.clustering.KMeans;
 import net.sf.javaml.core.Dataset;
 import net.sf.javaml.core.DefaultDataset;
 import net.sf.javaml.core.DenseInstance;
+import net.sf.javaml.core.Instance;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.duration.FiniteDuration;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class StatsEngine {
     @Nonnull
     private static final Logger LOG = LoggerFactory.getLogger(StatsEngine.class);
-    private static final FiniteDuration INITIAL_DELAY = FiniteDuration.apply(10, TimeUnit.SECONDS);
-    private static final FiniteDuration SCHEDULE_DELAY = FiniteDuration.apply(20, TimeUnit.SECONDS);
-
-    private static final String CLIENT_IOS = "ios";
-    private static final String CLIENT_ANDROID = "android";
-
-    @Nonnull
-    final ActorSystem actorSystem;
+    private static final FiniteDuration INITIAL_DELAY = FiniteDuration.apply(2, TimeUnit.SECONDS);
+    private static final FiniteDuration SCHEDULE_DELAY = FiniteDuration.apply(5, TimeUnit.SECONDS);
 
     // Collection of events (limited in size).
-    private static final int MAX_EVENTS = 1000 * 1000;
+    private static final int MAX_EVENTS = 1 * 1000 * 1000;
     @Nonnull
-    final private ArrayList<Event> events = new ArrayList<>(MAX_EVENTS);
-
-    public enum EventType {
-        LAT_LON_TO_MAPCODE,
-        MAPCODE_TO_LATLON,
-        INCORRECT_MAPCODE
-    }
-
-    public enum ClientType {
-        WEB,
-        IOS,
-        ANDROID;
-
-        public static ClientType fromString(@Nullable final String client) {
-            if (client == null) {
-                return WEB;
-            }
-            switch (client) {
-                case CLIENT_IOS:
-                    return IOS;
-                case CLIENT_ANDROID:
-                    return ANDROID;
-                default:
-                    return WEB;
-            }
-        }
-    }
-
-    // Definition of a single event:
-    class Event {
-        final long time;
-        final int eventType;
-        final double latDeg;
-        final double lonDeg;
-        final int clientType;
-
-        Event(final DateTime time,
-              final EventType eventType,
-              final double latDeg,
-              final double lonDeg,
-              final ClientType clientType) {
-            this.time = time.getMillis();
-            this.eventType = eventType.ordinal();
-            this.latDeg = latDeg;
-            this.lonDeg = lonDeg;
-            this.clientType = clientType.ordinal();
-        }
-    }
-
-    public StatsEngine() {
-        // Schedule processing.
-        this.actorSystem = ActorSystem.create("stats-processor");
-        scheduleNext(INITIAL_DELAY);
-    }
-
-    private void processOne() {
-        LOG.debug("showClusters...");
-        showClusters(10);
-        scheduleNext(SCHEDULE_DELAY);
-    }
-
-    private void scheduleNext(@Nonnull  final FiniteDuration duration) {
-        actorSystem.scheduler().scheduleOnce(duration, () -> {
-            processOne();
-        }, actorSystem.dispatcher());
-    }
+    private final CircularFifoQueue<Event> events = new CircularFifoQueue<>(MAX_EVENTS);
+    private DateTime last = UTCTime.now();
 
     public void addEvent(
-            @Nonnull final DateTime now,
+            @Nonnull final DateTime time,
             @Nonnull final EventType eventType,
             final double latDeg,
             final double lonDeg,
             @Nonnull final ClientType clientType) {
         LOG.trace("addEvent: eventType={}, latDeg={}, lonDeg={}, clientType={}", eventType, latDeg, lonDeg, clientType);
 
+        // Create event.
+        final GeoPoint point = new GeoPoint(latDeg, lonDeg);
+        final Event event = new Event(time, eventType, point, clientType);
+
         // Lock events collection while adding/removing.
         synchronized (events) {
-            // Add event.
-            final Event event = new Event(now, eventType, latDeg, lonDeg, clientType);
             events.add(event);
-
-            // Cap collection.
-            while (events.size() >= MAX_EVENTS) {
-                events.remove(events.size() - MAX_EVENTS);
+            final DateTime now = UTCTime.now();
+            if (last.plusSeconds(10).isBefore(now)) {
+                last = now;
+                LOG.debug("addEvent: total events={}", events.size());
             }
         }
     }
 
-    public void showClusters(final int nrClusters) {
-        LOG.debug("getClusters: nrClusters={}, events={}", nrClusters, events.size());
+    @Nonnull
+    public Set<Cluster> getClustersForArea(@Nonnull final GeoArea area, final int nrClusters) {
+        LOG.info("getClusters: boundingBox={}, nrClusters={}, total events={}", area, nrClusters, events.size());
 
         // Destination.
-        final Dataset dataset = new DefaultDataset();
+        final Dataset filteredDataset = new DefaultDataset();
 
         // Lock events collection while copying.
         synchronized (events) {
-            if (events.isEmpty()) {
-                return;
-            }
-            events.stream().forEach((x) -> {
-                final DenseInstance instance = new DenseInstance(new double[]{x.latDeg, x.lonDeg});
-                dataset.add(instance);
-            });
+            events.stream().
+                    filter(event -> area.contains(event.getPoint())).
+                    forEach(event -> {
+                        final DenseInstance instance = new DenseInstance(new double[]{event.getPoint().getLat(), event.getPoint().getLon()});
+                        filteredDataset.add(instance);
+                    });
         }
 
-        // Divide data set into a number of clusters.
-        final Clusterer clusterer = new KMeans(nrClusters);
-        final Dataset[] clusters = clusterer.cluster(dataset);
-        for (int i = 0; i < clusters.length; ++i) {
-            final Dataset cluster = clusters[i];
-            LOG.debug("cluster {}: size={}", i, cluster.size());
+        LOG.debug("getClusters: filtered events, clustering...");
+        final Set<Cluster> clusters = new HashSet<>();
+
+        // Need to check if dataset is empty or not.
+        if (!filteredDataset.isEmpty()) {
+
+            // Divide data set into a number of clusters.
+            final int iterations = Math.max(5, 100 - nrClusters);
+            final Clusterer clusterer = new KMeans(nrClusters, iterations);
+            final Dataset[] datasets = clusterer.cluster(filteredDataset);
+
+            for (final Dataset dataset : datasets) {
+                final int count = dataset.size();
+                GeoRectangle boundingBox = null;
+                for (int i = 0; i < dataset.size(); ++i) {
+                    final Instance instance = dataset.instance(i);
+                    final GeoPoint point = new GeoPoint(instance.value(0), instance.value(1));
+                    if (boundingBox == null) {
+                        boundingBox = new GeoRectangle(point, point);
+                    } else {
+                        boundingBox = boundingBox.grow(point);
+                    }
+                }
+                assert boundingBox != null;
+                final Cluster cluster = new Cluster(count, boundingBox);
+                clusters.add(cluster);
+            }
         }
+
+        LOG.debug("getClusters: {} clusters found", clusters.size());
+        clusters.stream().forEach(cluster -> {
+            LOG.debug("getClusters:  {}, {}", cluster.getCount(), cluster.getBoundingBox());
+        });
+        return clusters;
     }
 }

@@ -17,7 +17,7 @@
 package com.mapcode.stats;
 
 import com.google.gson.Gson;
-import com.mapcode.stats.dto.VersionDTO;
+import com.mapcode.stats.api.dto.VersionDTO;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.junit.After;
 import org.junit.Assert;

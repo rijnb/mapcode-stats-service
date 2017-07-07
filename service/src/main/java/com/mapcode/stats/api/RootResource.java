@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.mapcode.stats;
+package com.mapcode.stats.api;
 
 import javax.annotation.Nonnull;
 import javax.ws.rs.GET;

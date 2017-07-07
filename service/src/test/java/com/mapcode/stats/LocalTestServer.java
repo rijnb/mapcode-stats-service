@@ -16,8 +16,9 @@
 
 package com.mapcode.stats;
 
-import com.mapcode.stats.implementation.StatsResourceImpl;
-import com.mapcode.stats.implementation.RootResourceImpl;
+import com.mapcode.stats.analytics.StatsEngine;
+import com.mapcode.stats.api.implementation.RootResourceImpl;
+import com.mapcode.stats.api.implementation.StatsResourceImpl;
 import com.tomtom.speedtools.maven.MavenProperties;
 import com.tomtom.speedtools.rest.Reactor;
 import com.tomtom.speedtools.rest.ResourceProcessor;
@@ -69,14 +70,14 @@ public class LocalTestServer {
             }
         };
         final ResourceProcessor resourceProcessor = new ResourceProcessor(reactor);
-
+        final StatsEngine statsEngine = new StatsEngine();
         final MavenProperties mavenProperties = new MavenProperties(version);
 
         // Add root resource.
         server.getDeployment().getResources().add(new RootResourceImpl(mavenProperties));
 
         // Add mapcode resource.
-        server.getDeployment().getResources().add(new StatsResourceImpl(resourceProcessor));
+        server.getDeployment().getResources().add(new StatsResourceImpl(statsEngine, resourceProcessor));
         server.start();
         LOG.debug("start: Start local server, baseUrl={}", getBaseUrl());
     }

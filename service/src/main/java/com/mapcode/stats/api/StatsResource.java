@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.mapcode.stats;
+package com.mapcode.stats.api;
 
 import com.tomtom.speedtools.apivalidation.exceptions.ApiException;
 
 import javax.annotation.Nonnull;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
@@ -35,20 +33,20 @@ public interface StatsResource {
     /**
      * Strings used as path or url parameters.
      */
-    static final String PARAM_COUNT = "count";
-    static final String PARAM_OFFSET = "offset";
+    static final String PARAM_LAT_SW = "latSW";
+    static final String PARAM_LAT_NE = "latNE";
+    static final String PARAM_LON_SW = "lonSW";
+    static final String PARAM_LON_NE = "lonNE";
+    static final String PARAM_NR_CLUSTERS = "nrClusters";
 
-    static final String DEFAULT_OFFSET = "0";
-    static final String DEFAULT_COUNT = "1000";
-
-    /**
-     * Get total number of calls.
-     *
-     * @param response Response.
-     * @throws ApiException API exception, translated into HTTP status code.
-     */
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Path("stats/total")
-    void getCountTotalRequests(@Suspended @Nonnull AsyncResponse response) throws ApiException;
+    @Path("clusters/{" + PARAM_LAT_SW + "},{" + PARAM_LON_SW + "},{" + PARAM_LAT_NE + "},{" + PARAM_LON_NE + "}/{" + PARAM_NR_CLUSTERS + '}')
+    void getClusters(
+            @PathParam(PARAM_LAT_SW) double paramLatSW,
+            @PathParam(PARAM_LON_SW) double paramLonSW,
+            @PathParam(PARAM_LAT_NE) double paramLatNE,
+            @PathParam(PARAM_LON_NE) double paramLonNE,
+            @PathParam(PARAM_NR_CLUSTERS) int paramNrClusters,
+            @Suspended @Nonnull AsyncResponse response) throws ApiException;
 }

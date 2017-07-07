@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.mapcode.stats;
+package com.mapcode.stats.api;
 
 /**
  * This utility class contains constants used in the Web services API.
@@ -40,6 +40,9 @@ public final class ApiConstants {
 
     public static final double API_LAT_MAX = 90.0;
     public static final double API_LAT_MIN = -90.0;
+
+    public static final int API_NR_CLUSTERS_MIN = 1;
+    public static final int API_NR_CLUSTERS_MAX = 50;
 
     // Prevent instantiation.
     private ApiConstants() {

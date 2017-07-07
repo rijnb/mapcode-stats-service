@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.mapcode.stats.dto;
+package com.mapcode.stats.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.mapcode.stats.ApiConstants;
+import com.mapcode.stats.api.ApiConstants;
 import com.tomtom.speedtools.apivalidation.ApiDTO;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;

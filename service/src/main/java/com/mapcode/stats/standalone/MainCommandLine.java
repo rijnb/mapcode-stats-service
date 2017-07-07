@@ -18,7 +18,7 @@ package com.mapcode.stats.standalone;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.mapcode.stats.ResourcesModule;
+import com.mapcode.stats.api.ApiModule;
 import com.tomtom.speedtools.guice.GuiceConfigurationModule;
 import com.tomtom.speedtools.rest.ServicesModule;
 import org.apache.log4j.ConsoleAppender;
@@ -129,7 +129,7 @@ public class MainCommandLine {
                         "classpath:speedtools.default.properties",      // Default set required by SpeedTools.
                         "classpath:stats.properties"),              // Mapcode properties.
                 new ServicesModule(),
-                new ResourcesModule(),
+                new ApiModule(),
                 new StandaloneModule());
     }
 

@@ -11,13 +11,14 @@
 This application provides a visualization REST API for the mapcode service statistics.
 It uses the Java Library for Mapcodes extensively. 
 
+
 ### Build and Run
 
 The service always runs from a WAR file.
 To build the WAR file, type
 
 ```bash
-    cd <project-root>
+    cd {project-root}
     mvn clean package
 ```
 
@@ -26,7 +27,7 @@ You can run the WAR file in 3 ways:
 1. directly from the **command-line**, using:
 
 ```bash
-    java -jar deployment/target/deployment-<version>.war [--port <port>] [--silent] [--debug] [--help]
+    java -jar deployment/target/stats-{version}.war [--port {port}] [--silent] [--debug] [--help]
 ```
 
   This will start the service at `http://localhost:<port>/stats`. If `<port>` is not specified, the
@@ -41,17 +42,19 @@ You can run the WAR file in 3 ways:
      
   This will start the service at `http://localhost:8080/stats`.
 
-3. in a **Tomcat server**, deploying the file `deployment/target/deployment-<version>.war` into
+3. in a **Tomcat server**, deploying the file `deployment/target/stats-<version>.war` into
 your Tomcat instance.
 
 The first method, running the WAR file from the command-line, using `java` only is particularly
 useful if you wish use the XML services, for example, in a Microsoft Excel spreadsheet.
+
 
 ### Missing `stats-secret.properties` and `log4j.xml` Files
 
 The service requires 2 files called `stats-secret.properties` and `log4j.xml` to be present on the
 classpath. They are specifically **not** included in the WAR file by default, because that would
 make it impossible to change them without recompiling the service.
+
 
 #### `log4j.xml`
 
@@ -60,6 +63,7 @@ can be found in `resources/src/main/external-resources-examples/log4j.xml`.
 
 Make sure that file can be found on the classpath
 or add it `resources/src/main/external-resources` before building and it will be integrated in the WAR file.
+
 
 #### `stats-secret.properties`
  
@@ -72,8 +76,10 @@ make sure you add it to the classpath (or add it to `resources/src/main/external
 By default, you can simply use an empty `stats-secret.properties` file. So, you may want to
 use the example file as a starting point:
 
+```bash
     cd resources/src/main
     cp external-resources-example/* external-resources/
+```
 
 This will copy an example `log4j.xml` and `stats-secret.properties` file to your 
 resources.
@@ -83,7 +89,7 @@ Note that the files in `external-resources` are ignored by Git in `.gitignore`.
 If you wish to use MongoDB tracing, will need to provide your own local
 `stats-secret.properties`, which override the following properties:
 
-```
+```properties
     MongoDBTrace.writeEnabled = false
     MongoDBTrace.servers = your-server:27017 (eg. localhost:27017)
     MongoDBTrace.database = your-database (eg. trace)
@@ -109,15 +115,26 @@ using something like (MacOSX):
 Try out if the web services work by entering the following URL in your web browser
 (this should show you a HTML help page):
 
-```
+```bash
     http://localhost:8080/stats
     http://localhost:8080/stats/version
 ```
 Or use a tool like cURL:
 
-```
+```bash
     curl -X GET http://localhost:8080/stats
     curl -X GET http://localhost:8080/stats/version
+```
+
+## Setting up a test trace database in MongoDB
+
+The trace database for testing needs to have authentication enabled.
+Use the username `test` and password `test` for that, like this, 
+in the `mongo` shell:
+ 
+```
+    use trace
+    db.createUser({user: "test", pwd: "test", roles: ["readWrite"]})
 ```
 
 ## Using Git and `.gitignore`
@@ -145,6 +162,7 @@ If you're using NetBeans, filter:
 The local `.gitignore` file in the Git repository itself to reflect those file only that are produced by executing
 regular compile, build or release commands, such as:
 `target/ out/`
+
 
 ## Bug Reports and New Feature Requests
 

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.mapcode.stats.implementation;
+package com.mapcode.stats.api.implementation;
 
-import com.mapcode.stats.RootResource;
-import com.mapcode.stats.dto.VersionDTO;
+import com.mapcode.stats.api.RootResource;
+import com.mapcode.stats.api.dto.VersionDTO;
 import com.tomtom.speedtools.maven.MavenProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package com.mapcode.stats;
+package com.mapcode.stats.analytics;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import com.mapcode.stats.analytics.MapcodeResourceTraceHandler;
-import com.mapcode.stats.analytics.StatsEngine;
-import com.mapcode.stats.analytics.TraceProcessor;
-import com.mapcode.stats.implementation.RootResourceImpl;
-import com.mapcode.stats.implementation.StatsResourceImpl;
 import com.tomtom.speedtools.tracer.TracerFactory;
 import com.tomtom.speedtools.tracer.mongo.MongoDBTraceProperties;
 import com.tomtom.speedtools.tracer.mongo.MongoDBTraceStream;
@@ -31,15 +26,11 @@ import javax.annotation.Nonnull;
 import javax.inject.Singleton;
 
 
-public class ResourcesModule implements Module {
+public class AnalyticsModule implements Module {
 
     @Override
     public void configure(@Nonnull final Binder binder) {
         assert binder != null;
-
-        // Bind APIs to their implementation.
-        binder.bind(RootResource.class).to(RootResourceImpl.class).in(Singleton.class);
-        binder.bind(StatsResource.class).to(StatsResourceImpl.class).in(Singleton.class);
 
         // Set tracers.
         TracerFactory.setEnabled(true);
