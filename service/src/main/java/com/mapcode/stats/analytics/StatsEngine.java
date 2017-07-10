@@ -46,8 +46,8 @@ public class StatsEngine {
     @Nonnull
     private static final Logger LOG = LoggerFactory.getLogger(StatsEngine.class);
 
-    private static final int NR_ITERATIONS_MIN = 3;
-    private static final int NR_ITERATIONS_MAX = 100;
+    private static final int NR_ITERATIONS_MIN = 2;
+    private static final int NR_ITERATIONS_MAX = 50;
 
     // Collection of events (limited in size).
     private static final int MAX_EVENTS = 2 * 1000 * 1000;
@@ -82,9 +82,9 @@ public class StatsEngine {
     }
 
     @Nonnull
-    public Set<Cluster> getClustersForArea(@Nonnull final GeoArea area, final int nrClusters, final int nrIterations) {
+    public Set<Cluster> getClustersForArea(@Nonnull final GeoArea area, final int nrClusters, final int nrIterationsOrDefault) {
         LOG.info("getClusters: boundingBox={}, nrClusters={}, nrIterations={}, total events={}",
-                area, nrClusters, nrIterations, events.size());
+                area, nrClusters, nrIterationsOrDefault, events.size());
 
         // Destination.
         final Dataset filteredDataset = new DefaultDataset();
@@ -99,19 +99,20 @@ public class StatsEngine {
                     });
         }
 
-        LOG.debug("getClusters: filtered events, clustering...");
         final Set<Cluster> clusters = new HashSet<>();
-        final int iterations = (nrIterations != 0) ?
-                nrIterations :
+        final int nrEvents = filteredDataset.size();
+        final int nrIterations = (nrIterationsOrDefault != 0) ?
+                nrIterationsOrDefault :
                 MathUtils.limitTo(
-                        NR_ITERATIONS_MAX - (((filteredDataset.size() / 1000000) + 1) * ((nrClusters * 3) / 2)),
+                        NR_ITERATIONS_MAX - ((nrEvents * nrClusters) / 250000),
                         NR_ITERATIONS_MIN, NR_ITERATIONS_MAX);
 
+        LOG.debug("getClusters: filtered events, creating {} clusters from {} events in {} iterations...", nrClusters, nrEvents, nrIterations);
         // Need to check if dataset is empty or not.
         if (!filteredDataset.isEmpty()) {
 
             // Divide data set into a number of clusters.
-            final Clusterer clusterer = new KMeans(nrClusters, iterations);
+            final Clusterer clusterer = new KMeans(nrClusters, nrIterations);
             final Dataset[] datasets = clusterer.cluster(filteredDataset);
 
             for (final Dataset dataset : datasets) {
@@ -132,7 +133,7 @@ public class StatsEngine {
             }
         }
 
-        LOG.debug("getClusters: {} clusters found in {} iterations", clusters.size(), iterations);
+        LOG.debug("getClusters: {} clusters found in {} iterations", clusters.size(), nrIterations);
         clusters.stream().forEach(cluster -> {
             LOG.debug("getClusters: | {}, {}", cluster.getCount(), cluster.getBoundingBox());
         });
