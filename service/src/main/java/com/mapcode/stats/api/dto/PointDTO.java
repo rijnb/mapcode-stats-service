@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.mapcode.stats.api.ApiConstants;
 import com.tomtom.speedtools.apivalidation.ApiDTO;
+import com.tomtom.speedtools.geometry.GeoPoint;
 
 import javax.annotation.Nonnull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -54,6 +55,11 @@ public final class PointDTO extends ApiDTO {
             @Nonnull final Double lonDeg) {
         this.latDeg = latDeg;
         this.lonDeg = lonDeg;
+    }
+
+    public PointDTO(@Nonnull final GeoPoint point) {
+        this.latDeg = point.getLat();
+        this.lonDeg = point.getLon();
     }
 
     @SuppressWarnings("UnusedDeclaration")

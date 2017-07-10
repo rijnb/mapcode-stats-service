@@ -26,6 +26,7 @@ import com.tomtom.speedtools.geometry.GeoArea;
 import com.tomtom.speedtools.geometry.GeoPoint;
 import com.tomtom.speedtools.geometry.GeoRectangle;
 import com.tomtom.speedtools.time.UTCTime;
+import com.tomtom.speedtools.utils.MathUtils;
 import net.sf.javaml.clustering.Clusterer;
 import net.sf.javaml.clustering.KMeans;
 import net.sf.javaml.core.Dataset;
@@ -36,21 +37,22 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.duration.FiniteDuration;
 
 import javax.annotation.Nonnull;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 public class StatsEngine {
     @Nonnull
     private static final Logger LOG = LoggerFactory.getLogger(StatsEngine.class);
-    private static final FiniteDuration INITIAL_DELAY = FiniteDuration.apply(2, TimeUnit.SECONDS);
-    private static final FiniteDuration SCHEDULE_DELAY = FiniteDuration.apply(5, TimeUnit.SECONDS);
+
+    private static final int NR_ITERATIONS_MIN = 3;
+    private static final int NR_ITERATIONS_MAX = 100;
 
     // Collection of events (limited in size).
-    private static final int MAX_EVENTS = 1 * 1000 * 1000;
+    private static final int MAX_EVENTS = 2 * 1000 * 1000;
+    private static long totalEvents = 0L;
+
     @Nonnull
     private final CircularFifoQueue<Event> events = new CircularFifoQueue<>(MAX_EVENTS);
     private DateTime last = UTCTime.now();
@@ -69,18 +71,20 @@ public class StatsEngine {
 
         // Lock events collection while adding/removing.
         synchronized (events) {
+            ++totalEvents;
             events.add(event);
             final DateTime now = UTCTime.now();
             if (last.plusSeconds(10).isBefore(now)) {
                 last = now;
-                LOG.debug("addEvent: total events={}", events.size());
+                LOG.debug("addEvent: total events={} (of which {} cached)", totalEvents, events.size());
             }
         }
     }
 
     @Nonnull
-    public Set<Cluster> getClustersForArea(@Nonnull final GeoArea area, final int nrClusters) {
-        LOG.info("getClusters: boundingBox={}, nrClusters={}, total events={}", area, nrClusters, events.size());
+    public Set<Cluster> getClustersForArea(@Nonnull final GeoArea area, final int nrClusters, final int nrIterations) {
+        LOG.info("getClusters: boundingBox={}, nrClusters={}, nrIterations={}, total events={}",
+                area, nrClusters, nrIterations, events.size());
 
         // Destination.
         final Dataset filteredDataset = new DefaultDataset();
@@ -97,12 +101,16 @@ public class StatsEngine {
 
         LOG.debug("getClusters: filtered events, clustering...");
         final Set<Cluster> clusters = new HashSet<>();
+        final int iterations = (nrIterations != 0) ?
+                nrIterations :
+                MathUtils.limitTo(
+                        NR_ITERATIONS_MAX - (((filteredDataset.size() / 1000000) + 1) * ((nrClusters * 3) / 2)),
+                        NR_ITERATIONS_MIN, NR_ITERATIONS_MAX);
 
         // Need to check if dataset is empty or not.
         if (!filteredDataset.isEmpty()) {
 
             // Divide data set into a number of clusters.
-            final int iterations = Math.max(5, 100 - nrClusters);
             final Clusterer clusterer = new KMeans(nrClusters, iterations);
             final Dataset[] datasets = clusterer.cluster(filteredDataset);
 
@@ -124,9 +132,9 @@ public class StatsEngine {
             }
         }
 
-        LOG.debug("getClusters: {} clusters found", clusters.size());
+        LOG.debug("getClusters: {} clusters found in {} iterations", clusters.size(), iterations);
         clusters.stream().forEach(cluster -> {
-            LOG.debug("getClusters:  {}, {}", cluster.getCount(), cluster.getBoundingBox());
+            LOG.debug("getClusters: | {}, {}", cluster.getCount(), cluster.getBoundingBox());
         });
         return clusters;
     }

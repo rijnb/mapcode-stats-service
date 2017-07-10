@@ -26,9 +26,9 @@
     <packaging>pom</packaging>
     <version>0.0.1</version>
 
-    <name>Mapcode Visualization Service</name>
+    <name>Mapcode Stats Service</name>
     <description>
-        This application provides a visualization service for the REST API.
+        This application provides a statistics service for the REST API.
         For more info: http://www.mapcode.com
     </description>
 
@@ -111,7 +111,7 @@
         <resteasy.version>3.1.3.Final</resteasy.version>
         <scala.version>2.11.11</scala.version>
         <slf4j.version>1.7.25</slf4j.version>
-        <speedtools.version>3.2.1</speedtools.version>
+        <speedtools.version>3.2.2-SNAPSHOT</speedtools.version>
     </properties>
 
     <distributionManagement>
@@ -350,6 +350,13 @@
                 <groupId>org.jboss.resteasy</groupId>
                 <artifactId>tjws</artifactId>
                 <version>${resteasy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito-core.version}</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>

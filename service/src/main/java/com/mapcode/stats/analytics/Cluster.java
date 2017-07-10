@@ -26,8 +26,8 @@ public class Cluster {
     private final GeoRectangle boundingBox;
 
     Cluster(final int count, @Nonnull final GeoRectangle boundingBox) {
-        this.count = count;
         this.boundingBox = boundingBox;
+        this.count = count;
     }
 
     public int getCount() {

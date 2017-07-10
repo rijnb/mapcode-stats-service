@@ -28,8 +28,8 @@ import java.util.concurrent.TimeUnit;
 public class TraceProcessor {
     @Nonnull
     private static final Logger LOG = LoggerFactory.getLogger(TraceProcessor.class);
-    private static final FiniteDuration INITIAL_DELAY = FiniteDuration.apply(5, TimeUnit.SECONDS);
-    private static final FiniteDuration SCHEDULE_DELAY = FiniteDuration.apply(10, TimeUnit.MILLISECONDS);
+    private static final FiniteDuration INITIAL_DELAY = FiniteDuration.apply(2, TimeUnit.SECONDS);
+    private static final FiniteDuration SCHEDULE_DELAY = FiniteDuration.apply(500, TimeUnit.MILLISECONDS);
 
     @Nonnull
     final ActorSystem actorSystem;
@@ -52,17 +52,18 @@ public class TraceProcessor {
 
         // Start event processor.
         events.moveToStart();
-        scheduleNext(INITIAL_DELAY);
+        scheduleNextPlaybackToEnd(INITIAL_DELAY);
     }
 
-    private void processOne() {
+    private void playbackToEndOnce() {
+        // Playback a number of events (not necessarily all events to end).
         events.playbackToEnd();
-        scheduleNext(SCHEDULE_DELAY);
+        scheduleNextPlaybackToEnd(SCHEDULE_DELAY);
     }
 
-    private void scheduleNext(@Nonnull final FiniteDuration duration) {
+    private void scheduleNextPlaybackToEnd(@Nonnull final FiniteDuration duration) {
         actorSystem.scheduler().scheduleOnce(duration, () -> {
-            processOne();
+            playbackToEndOnce();
         }, actorSystem.dispatcher());
     }
 }

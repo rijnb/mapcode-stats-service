@@ -44,6 +44,9 @@ public final class ApiConstants {
     public static final int API_NR_CLUSTERS_MIN = 1;
     public static final int API_NR_CLUSTERS_MAX = 50;
 
+    public static final int API_NR_ITERATIONS_MIN = 0;
+    public static final int API_NR_ITERATIONS_MAX = 100;
+
     // Prevent instantiation.
     private ApiConstants() {
         super();

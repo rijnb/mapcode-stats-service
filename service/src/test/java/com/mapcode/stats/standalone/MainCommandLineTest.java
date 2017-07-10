@@ -72,7 +72,7 @@ public class MainCommandLineTest {
 
     public void checkVersion() {
         LOG.info("checkVersion");
-        final String expectedJson = "{\"version\":\"1.0\"}";
+        final String expectedJson = "{\"version\":\"0.0.1\"}";
         final Response response = new ResteasyClientBuilder().build().
                 target(localUrl("/stats/version")).
                 request().

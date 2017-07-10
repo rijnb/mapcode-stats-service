@@ -118,12 +118,14 @@ Try out if the web services work by entering the following URL in your web brows
 ```bash
     http://localhost:8080/stats
     http://localhost:8080/stats/version
+    http://localhost:8080/stats/clusters/-80,-100,80,100
 ```
 Or use a tool like cURL:
 
 ```bash
     curl -X GET http://localhost:8080/stats
     curl -X GET http://localhost:8080/stats/version
+    curl -X GET http://localhost:8080/stats/clusters/-80,-100,80,100
 ```
 
 ## Setting up a test trace database in MongoDB
