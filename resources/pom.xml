@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.mapcode</groupId>
+        <groupId>com.mapcode.stats</groupId>
         <artifactId>mapcode-stats-service</artifactId>
         <version>0.0.1</version>
     </parent>
@@ -33,6 +33,7 @@
     <description>
         Shared resources for Mapcode Stats.
     </description>
+
     <build>
         <resources>
             <resource>
@@ -44,7 +45,7 @@
 
     <profiles>
 
-        <!-- Test profile. Uses example properties from external-resources-example. -->
+        <!-- Test profile. Uses example properties from external-resources-test. -->
         <profile>
             <id>test</id>
             <activation>
@@ -53,7 +54,7 @@
             <build>
                 <resources>
                     <resource>
-                        <directory>src/main/external-resources-example</directory>
+                        <directory>src/main/external-resources-test</directory>
                         <filtering>true</filtering>
                     </resource>
                 </resources>
@@ -69,7 +70,9 @@
                                 </goals>
                                 <configuration>
                                     <includes>
-                                        <include>src/main/external-resources-example/*</include>
+                                        <include>**/external-resources-test/*.properties</include>
+                                        <include>**/external-resources-test/*.xml</include>
+                                        <include>**/external-resources-test/*.conf</include>
                                     </includes>
                                 </configuration>
                             </execution>
@@ -101,7 +104,9 @@
                                 </goals>
                                 <configuration>
                                     <includes>
-                                        <include>src/main/external-resources/*</include>
+                                        <include>**/external-resources/*.properties</include>
+                                        <include>**/external-resources/*.xml</include>
+                                        <include>**/external-resources/*.conf</include>
                                     </includes>
                                 </configuration>
                             </execution>

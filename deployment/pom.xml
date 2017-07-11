@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.mapcode</groupId>
+        <groupId>com.mapcode.stats</groupId>
         <artifactId>mapcode-stats-service</artifactId>
         <version>0.0.1</version>
     </parent>
@@ -58,6 +58,11 @@
         <dependency>
             <groupId>com.tomtom.speedtools</groupId>
             <artifactId>guice</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.tomtom.speedtools</groupId>
+            <artifactId>resources</artifactId>
         </dependency>
 
         <dependency>
@@ -106,7 +111,7 @@
                             <tasks>
                                 <copy todir="${project.basedir}/target/webapp/">
                                     <fileset dir="${project.build.directory}/classes/">
-                                        <include name="com/mapcode/services/cli/*.class"/>
+                                        <include name="com/mapcode/stats/cli/*.class"/>
                                     </fileset>
                                 </copy>
                             </tasks>
@@ -139,6 +144,24 @@
                         </resource>
                     </webResources>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-remote-resources-plugin</artifactId>
+                <version>${maven-remote-resources-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <configuration>
+                            <resourceBundles>
+                                <resourceBundle>com.tomtom.speedtools:resources:${speedtools.version}</resourceBundle>
+                            </resourceBundles>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>

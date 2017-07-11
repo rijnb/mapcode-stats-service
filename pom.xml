@@ -20,7 +20,7 @@
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.mapcode</groupId>
+    <groupId>com.mapcode.stats</groupId>
     <artifactId>mapcode-stats-service</artifactId>
 
     <packaging>pom</packaging>
@@ -524,7 +524,7 @@
 
     <profiles>
 
-        <!-- Test profile. Uses example properties from external-resources-example. -->
+        <!-- Test profile. Uses example properties from external-resources-test. -->
         <profile>
             <id>test</id>
             <activation>

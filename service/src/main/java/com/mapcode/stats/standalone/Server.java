@@ -23,7 +23,6 @@ import com.mapcode.stats.api.implementation.StatsResourceImpl;
 import com.tomtom.speedtools.maven.MavenProperties;
 import com.tomtom.speedtools.rest.Reactor;
 import com.tomtom.speedtools.rest.ResourceProcessor;
-import com.tomtom.speedtools.testutils.akka.SimpleExecutionContext;
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.plugins.interceptors.CacheControlFeature;
 import org.jboss.resteasy.plugins.providers.*;
@@ -32,10 +31,8 @@ import org.jboss.resteasy.plugins.providers.jaxb.*;
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.concurrent.ExecutionContext;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -43,6 +40,7 @@ import java.util.List;
 public class Server {
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
+    private final Reactor reactor;
     private final StatsEngine statsEngine;
     private final MavenProperties mavenProperties;
     private boolean started = false;
@@ -50,8 +48,10 @@ public class Server {
 
     @Inject
     public Server(
+            @Nonnull final Reactor reactor,
             @Nonnull final StatsEngine statsEngine,
             @Nonnull final MavenProperties mavenProperties) {
+        this.reactor = reactor;
         this.statsEngine = statsEngine;
         this.mavenProperties = mavenProperties;
         server = new TJWSEmbeddedJaxrsServer();
@@ -65,21 +65,7 @@ public class Server {
          * Create a simple ResourceProcessor, required for implementation of REST service using the
          * SpeedTools framework.
          */
-        LOG.debug("Server: create execution context...");
-        final Reactor reactor = new Reactor() {
-            @Nonnull
-            @Override
-            public ExecutionContext getExecutionContext() {
-                return SimpleExecutionContext.getInstance();
-            }
-
-            // This method is stubbed and never used.
-            @Nonnull
-            @Override
-            public DateTime getSystemStartupTime() {
-                return new DateTime();
-            }
-        };
+        LOG.debug("Server: create resource processor...");
         final ResourceProcessor resourceProcessor = new ResourceProcessor(reactor);
 
         LOG.debug("Server: add resources...");

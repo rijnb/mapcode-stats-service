@@ -41,7 +41,7 @@ public class AnalyticsModule implements Module {
         binder.bind(MapcodeResourceTraceHandler.class).in(Singleton.class);
 
         // Bind analytics engine.
-        binder.bind(StatsEngine.class).asEagerSingleton();
+        binder.bind(StatsEngine.class).in(Singleton.class);
         binder.bind(TraceProcessor.class).asEagerSingleton();
     }
 }

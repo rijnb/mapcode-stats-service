@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.mapcode</groupId>
+        <groupId>com.mapcode.stats</groupId>
         <artifactId>mapcode-stats-service</artifactId>
         <version>0.0.1</version>
     </parent>
