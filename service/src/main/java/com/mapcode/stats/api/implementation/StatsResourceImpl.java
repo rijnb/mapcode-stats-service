@@ -113,6 +113,11 @@ public class StatsResourceImpl implements StatsResource {
                 final GeoPoint northEast = new GeoPoint(MathUtils.limitTo(paramLatNE, -90.0, 90.0), MathUtils.limitTo(paramLonNE, -180.0, Geo.LON180));
                 final GeoRectangle area = new GeoRectangle(southWest, northEast);
 
+                /**
+                 * The clustering algorithm takes a lot of resources, like memory. We don't want to run into
+                 * out of memory situations, so we will allow only 1 call at a time, by acquiring a global lock.
+                 * If it's busy, the service simply bails out with "TOO MANY REQUESTS".
+                 */
                 LOG.debug("getClustersForArea: acquiring lock...");
                 final Set<Cluster> clustersForArea;
                 final DateTime beforeLock = UTCTime.now();
@@ -127,6 +132,8 @@ public class StatsResourceImpl implements StatsResource {
                     LOG.info("getClustersForArea: nrClusters={}, area={}", paramNrClusters, area);
                     clustersForArea = statsEngine.getClustersForArea(area, paramNrClusters, paramNrIterations);
                 }
+
+                // Other requests may be processed from here on.
                 final Integer totalTotalNrEvents = clustersForArea.stream().map(x -> x.getCount()).reduce(0, Integer::sum);
 
                 final List<ClusterDTO> list = new ArrayList<>();
