@@ -21,6 +21,7 @@ import com.mapcode.stats.api.RootResource;
 import com.mapcode.stats.api.dto.StatusDTO;
 import com.mapcode.stats.api.dto.VersionDTO;
 import com.tomtom.speedtools.maven.MavenProperties;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,10 +107,12 @@ public class RootResourceImpl implements RootResource {
         assert response != null;
         LOG.info("getStatus: get status");
         final StatusDTO status = new StatusDTO(
-                InternalStats.statsNrOfRequestsActive.get(),
-                InternalStats.statsNrOfRequestsTotal.get(),
-                InternalStats.statsNrOfEventsInCache.get(),
-                InternalStats.statsNrOfEventsTotal.get());
+                InternalStats.statsActiveRequests.get(),
+                InternalStats.statsTotalRequests.get(),
+                InternalStats.statsCachedEvents.get(),
+                InternalStats.statsTotalEvents.get(),
+                new DateTime(InternalStats.statsOldestEvent.get()),
+                new DateTime(InternalStats.statsNewestEvent.get()));
         response.resume(Response.ok(status).build());
     }
 }

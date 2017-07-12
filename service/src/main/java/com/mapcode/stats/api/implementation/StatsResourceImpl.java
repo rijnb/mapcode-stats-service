@@ -45,8 +45,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static com.mapcode.stats.InternalStats.statsNrOfRequestsActive;
-import static com.mapcode.stats.InternalStats.statsNrOfRequestsTotal;
+import static com.mapcode.stats.InternalStats.statsActiveRequests;
+import static com.mapcode.stats.InternalStats.statsTotalRequests;
 import static javax.ws.rs.core.Response.status;
 
 /**
@@ -105,8 +105,8 @@ public class StatsResourceImpl implements StatsResource {
                 throw new ApiIntegerOutOfRangeException(PARAM_NR_ITERATIONS, paramNrIterations, ApiConstants.API_NR_ITERATIONS_MIN, ApiConstants.API_NR_ITERATIONS_MAX);
             }
             try {
-                statsNrOfRequestsActive.incrementAndGet();
-                statsNrOfRequestsTotal.incrementAndGet();
+                statsActiveRequests.incrementAndGet();
+                statsTotalRequests.incrementAndGet();
 
                 // Cap lat and lons.
                 final GeoPoint southWest = new GeoPoint(MathUtils.limitTo(paramLatSW, -90.0, 90.0), MathUtils.limitTo(paramLonSW, -180.0, Geo.LON180));
@@ -153,7 +153,7 @@ public class StatsResourceImpl implements StatsResource {
                 // The response is already set within this method body.
                 return Futures.successful(null);
             } finally {
-                statsNrOfRequestsActive.decrementAndGet();
+                statsActiveRequests.decrementAndGet();
             }
         });
     }

@@ -20,6 +20,7 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.mapcode.stats.api.implementation.RootResourceImpl;
 import com.mapcode.stats.api.implementation.StatsResourceImpl;
+import com.tomtom.speedtools.rest.RestEasyJacksonContextResolver;
 
 import javax.annotation.Nonnull;
 import javax.inject.Singleton;
@@ -30,6 +31,9 @@ public class ApiModule implements Module {
     @Override
     public void configure(@Nonnull final Binder binder) {
         assert binder != null;
+
+        // Bind a Jackson resolver for better JSON.
+        binder.bind(RestEasyJacksonContextResolver.class).in(Singleton.class);
 
         // Bind APIs to their implementation.
         binder.bind(RootResource.class).to(RootResourceImpl.class).in(Singleton.class);

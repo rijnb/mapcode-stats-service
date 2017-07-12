@@ -31,7 +31,7 @@ public class TraceProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(TraceProcessor.class);
     private static final FiniteDuration INITIAL_DELAY = FiniteDuration.apply(2, TimeUnit.SECONDS);
     private static final FiniteDuration SCHEDULE_DELAY = FiniteDuration.apply(500, TimeUnit.MILLISECONDS);
-    private static final int NR_DAYS_TO_REWIND_AT_START = 90;
+    private static final int NR_DAYS_TO_REWIND_AT_START = 7;
 
     @Nonnull
     final ActorSystem actorSystem;

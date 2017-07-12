@@ -17,6 +17,7 @@
 package com.mapcode.stats.api;
 
 import com.mapcode.stats.analytics.StatsEngine;
+import org.joda.time.DateTime;
 
 /**
  * This utility class contains constants used in the Web services API.
@@ -39,6 +40,9 @@ public final class ApiConstants {
      */
     public static final int API_VERSION_LEN_MIN = 1;
     public static final int API_VERSION_LEN_MAX = 250;
+
+    public static final DateTime API_DATE_MAX = new DateTime(2200, 1, 1, 0, 0);
+    public static final DateTime API_DATE_MIN = new DateTime(1900, 1, 1, 0, 0);
 
     public static final double API_LAT_MAX = 90.0;
     public static final double API_LAT_MIN = -90.0;

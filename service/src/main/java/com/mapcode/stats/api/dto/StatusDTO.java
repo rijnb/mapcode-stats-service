@@ -18,10 +18,16 @@ package com.mapcode.stats.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.mapcode.stats.api.ApiConstants;
 import com.tomtom.speedtools.apivalidation.ApiDTO;
+import com.tomtom.speedtools.json.DateTimeSerializer.FromStringDeserializer;
+import com.tomtom.speedtools.json.DateTimeSerializer.ToStringSerializer;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -36,41 +42,55 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class StatusDTO extends ApiDTO {
 
-    @XmlElement(name = "nrOfRequestsActive")
-    @Nonnull
-    private int nrOfRequestsActive;
+    @XmlElement(name = "activeRequests")
+    private int activeRequests;
 
-    @XmlElement(name = "nrOfRequestsTotal")
-    @Nonnull
-    private int nrOfRequestsTotal;
+    @XmlElement(name = "totalRequests")
+    private int totalRequests;
 
-    @XmlElement(name = "nrOfEventsInCache")
-    @Nonnull
-    private int nrOfEventsInCache;
+    @XmlElement(name = "cachedEvents")
+    private int cachedEvents;
 
-    @XmlElement(name = "nrOfEventsTotal")
+    @XmlElement(name = "totalEvents")
+    private int totalEvents;
+
+    @XmlElement(name = "oldestEvent")
     @Nonnull
-    private int nrOfEventsTotal;
+    @JsonSerialize(using = ToStringSerializer.class)
+    @JsonDeserialize(using = FromStringDeserializer.class)
+    private DateTime oldestEvent;
+
+    @XmlElement(name = "newestEvent")
+    @Nonnull
+    @JsonSerialize(using = ToStringSerializer.class)
+    @JsonDeserialize(using = FromStringDeserializer.class)
+    private DateTime newestEvent;
 
     @Override
     public void validate() {
         validator().start();
-        validator().checkInteger(true, "nrOfRequestsActive", nrOfRequestsActive, 0, Integer.MAX_VALUE);
-        validator().checkInteger(true, "nrOfRequestsTotal", nrOfRequestsTotal, 0, Integer.MAX_VALUE);
-        validator().checkInteger(true, "nrOfEventsInCache", nrOfEventsInCache, 0, Integer.MAX_VALUE);
-        validator().checkInteger(true, "nrOfEventsTotal", nrOfEventsTotal, 0, Integer.MAX_VALUE);
+        validator().checkInteger(true, "activeRequests", activeRequests, 0, Integer.MAX_VALUE);
+        validator().checkInteger(true, "totalRequests", totalRequests, 0, Integer.MAX_VALUE);
+        validator().checkInteger(true, "cachedEvents", cachedEvents, 0, Integer.MAX_VALUE);
+        validator().checkInteger(true, "totalEvents", totalEvents, 0, Integer.MAX_VALUE);
+        validator().checkDate(true, "oldestEvent", oldestEvent, ApiConstants.API_DATE_MIN, ApiConstants.API_DATE_MAX);
+        validator().checkDate(true, "newestEvent", newestEvent, ApiConstants.API_DATE_MIN, ApiConstants.API_DATE_MAX);
         validator().done();
     }
 
     public StatusDTO(
-            final int nrOfRequestsActive,
-            final int nrOfRequestsTotal,
-            final int nrOfEventsInCache,
-            final int nrOfEventsTotal) {
-        this.nrOfRequestsActive = nrOfRequestsActive;
-        this.nrOfRequestsTotal = nrOfRequestsTotal;
-        this.nrOfEventsInCache = nrOfEventsInCache;
-        this.nrOfEventsTotal = nrOfEventsTotal;
+            final int activeRequests,
+            final int totalRequests,
+            final int cachedEvents,
+            final int totalEvents,
+            @Nonnull final DateTime oldestEvent,
+            @Nonnull final DateTime newestEvent) {
+        this.activeRequests = activeRequests;
+        this.totalRequests = totalRequests;
+        this.cachedEvents = cachedEvents;
+        this.totalEvents = totalEvents;
+        this.oldestEvent = oldestEvent;
+        this.newestEvent = newestEvent;
     }
 
     @SuppressWarnings("UnusedDeclaration")
@@ -80,44 +100,66 @@ public final class StatusDTO extends ApiDTO {
         super();
     }
 
-    public int getNrOfRequestsActive() {
+    public int getActiveRequests() {
         beforeGet();
-        return nrOfRequestsActive;
+        return activeRequests;
     }
 
-    public void setNrOfRequestsActive(final int nrOfRequestsActive) {
+    public void setActiveRequests(final int activeRequests) {
         beforeSet();
-        this.nrOfRequestsActive = nrOfRequestsActive;
+        this.activeRequests = activeRequests;
     }
 
-    public int getNrOfRequestsTotal() {
+    public int getTotalRequests() {
         beforeGet();
-        return nrOfRequestsTotal;
+        return totalRequests;
     }
 
-    public void setNrOfRequestsTotal(final int nrOfRequestsTotal) {
+    public void setTotalRequests(final int totalRequests) {
         beforeSet();
-        this.nrOfRequestsTotal = nrOfRequestsTotal;
+        this.totalRequests = totalRequests;
     }
 
-    public int getNrOfEventsInCache() {
+    public int getCachedEvents() {
         beforeGet();
-        return nrOfEventsInCache;
+        return cachedEvents;
     }
 
-    public void setNrOfEventsInCache(final int nrOfEventsInCache) {
+    public void setCachedEvents(final int cachedEvents) {
         beforeSet();
-        this.nrOfEventsInCache = nrOfEventsInCache;
+        this.cachedEvents = cachedEvents;
     }
 
-    public int getNrOfEventsTotal() {
+    public int getTotalEvents() {
         beforeGet();
-        return nrOfEventsTotal;
+        return totalEvents;
     }
 
-    public void setNrOfEventsTotal(final int nrOfEventsTotal) {
+    public void setTotalEvents(final int totalEvents) {
         beforeSet();
-        this.nrOfEventsTotal = nrOfEventsTotal;
+        this.totalEvents = totalEvents;
+    }
+
+    @Nonnull
+    public DateTime getOldestEvent() {
+        beforeGet();
+        return oldestEvent;
+    }
+
+    public void setOldestEvent(@Nonnull  final DateTime oldestEvent) {
+        beforeSet();
+        this.oldestEvent = oldestEvent;
+    }
+
+    @Nonnull
+    public DateTime getNewestEvent() {
+        beforeGet();
+        return newestEvent;
+    }
+
+    public void setNewestEvent(@Nonnull  final DateTime newestEvent) {
+        beforeSet();
+        this.newestEvent = newestEvent;
     }
 
     @Override

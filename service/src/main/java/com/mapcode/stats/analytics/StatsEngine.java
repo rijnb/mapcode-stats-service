@@ -74,13 +74,15 @@ public class StatsEngine {
         // Lock events collection while adding/removing.
         synchronized (events) {
             events.add(event);
-            InternalStats.statsNrOfEventsTotal.incrementAndGet();
-            InternalStats.statsNrOfEventsInCache.set(events.size());
+            InternalStats.statsTotalEvents.incrementAndGet();
+            InternalStats.statsCachedEvents.set(events.size());
+            InternalStats.statsOldestEvent.set(events.peek().getTime().getMillis());
+            InternalStats.statsNewestEvent.set(event.getTime().getMillis());
             final DateTime now = UTCTime.now();
             if (last.plusSeconds(10).isBefore(now)) {
                 last = now;
                 LOG.debug("addEvent: total events={} (of which {} cached)",
-                        InternalStats.statsNrOfEventsTotal.get(), events.size());
+                        InternalStats.statsTotalEvents.get(), events.size());
             }
         }
     }

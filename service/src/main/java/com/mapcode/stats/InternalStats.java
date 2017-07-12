@@ -21,12 +21,15 @@
 package com.mapcode.stats;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class InternalStats {
 
     // Some internal stats.
-    public static final AtomicInteger statsNrOfRequestsActive = new AtomicInteger(0);
-    public static final AtomicInteger statsNrOfRequestsTotal = new AtomicInteger(0);
-    public static final AtomicInteger statsNrOfEventsInCache = new AtomicInteger(0);
-    public static final AtomicInteger statsNrOfEventsTotal = new AtomicInteger(0);
+    public static final AtomicInteger statsActiveRequests = new AtomicInteger(0);
+    public static final AtomicInteger statsTotalRequests = new AtomicInteger(0);
+    public static final AtomicInteger statsCachedEvents = new AtomicInteger(0);
+    public static final AtomicInteger statsTotalEvents = new AtomicInteger(0);
+    public static final AtomicLong statsOldestEvent = new AtomicLong(0);
+    public static final AtomicLong statsNewestEvent = new AtomicLong(0);
 }
