@@ -107,7 +107,7 @@ public class RootResourceImpl implements RootResource {
         LOG.info("getStatus: get status");
         final StatusDTO status = new StatusDTO(
                 InternalStats.statsNrOfRequestsActive.get(),
-                InternalStats.statsNrOfRequestsActive.get(),
+                InternalStats.statsNrOfRequestsTotal.get(),
                 InternalStats.statsNrOfEventsInCache.get(),
                 InternalStats.statsNrOfEventsTotal.get());
         response.resume(Response.ok(status).build());
