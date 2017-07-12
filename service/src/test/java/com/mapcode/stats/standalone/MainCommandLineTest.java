@@ -72,14 +72,14 @@ public class MainCommandLineTest {
 
     public void checkVersion() {
         LOG.info("checkVersion");
-        final String expectedJson = "{\"version\":\"0.0.1\"}";
+        final String expectedJson = "{\"version\":";
         final Response response = new ResteasyClientBuilder().build().
                 target(localUrl("/stats/version")).
                 request().
                 accept(MediaType.APPLICATION_JSON_TYPE).get();
         Assert.assertNotNull(response);
         Assert.assertEquals(200, response.getStatus());
-        Assert.assertEquals(expectedJson, response.readEntity(String.class));
+        Assert.assertTrue(response.readEntity(String.class).startsWith(expectedJson));
     }
 
     @Nonnull

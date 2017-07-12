@@ -23,7 +23,7 @@
     <parent>
         <groupId>com.mapcode.stats</groupId>
         <artifactId>mapcode-stats-service</artifactId>
-        <version>0.0.1</version>
+        <version>1.0.8</version>
     </parent>
 
     <artifactId>deployment</artifactId>
@@ -144,24 +144,6 @@
                         </resource>
                     </webResources>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-remote-resources-plugin</artifactId>
-                <version>${maven-remote-resources-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
-                        <configuration>
-                            <resourceBundles>
-                                <resourceBundle>com.tomtom.speedtools:resources:${speedtools.version}</resourceBundle>
-                            </resourceBundles>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>

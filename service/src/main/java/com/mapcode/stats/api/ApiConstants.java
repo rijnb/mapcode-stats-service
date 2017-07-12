@@ -16,6 +16,8 @@
 
 package com.mapcode.stats.api;
 
+import com.mapcode.stats.analytics.StatsEngine;
+
 /**
  * This utility class contains constants used in the Web services API.
  */
@@ -41,11 +43,11 @@ public final class ApiConstants {
     public static final double API_LAT_MAX = 90.0;
     public static final double API_LAT_MIN = -90.0;
 
-    public static final int API_NR_CLUSTERS_MIN = 1;
-    public static final int API_NR_CLUSTERS_MAX = 50;
+    public static final int API_NR_CLUSTERS_MIN = StatsEngine.NR_CLUSTERS_MIN;
+    public static final int API_NR_CLUSTERS_MAX = StatsEngine.NR_CLUSTERS_MAX;
 
     public static final int API_NR_ITERATIONS_MIN = 0;
-    public static final int API_NR_ITERATIONS_MAX = 100;
+    public static final int API_NR_ITERATIONS_MAX = StatsEngine.NR_ITERATIONS_MAX;
 
     // Prevent instantiation.
     private ApiConstants() {

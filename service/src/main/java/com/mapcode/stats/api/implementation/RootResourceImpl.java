@@ -16,7 +16,9 @@
 
 package com.mapcode.stats.api.implementation;
 
+import com.mapcode.stats.InternalStats;
 import com.mapcode.stats.api.RootResource;
+import com.mapcode.stats.api.dto.StatusDTO;
 import com.mapcode.stats.api.dto.VersionDTO;
 import com.tomtom.speedtools.maven.MavenProperties;
 import org.slf4j.Logger;
@@ -51,7 +53,7 @@ public class RootResourceImpl implements RootResource {
 
             "GET /stats/clusters/[?clusters={nrClusters}]\n" +
             "GET /stats/clusters/{latSW},{lonSW},{latNE},{lonNE}[?clusters={nrClusters}][&iterations={nrIterations}]\n" +
-            "                   Returns statistics for the entire world, or for a bounding box specified " +
+            "                   Returns statistics for the entire world, or for a bounding box specified\n" +
             "                   by its South-West and North-East corner coordinates.\n\n" +
 
             "                   Allowed ranges:\n" +
@@ -103,6 +105,11 @@ public class RootResourceImpl implements RootResource {
     public void getStatus(@Suspended @Nonnull final AsyncResponse response) {
         assert response != null;
         LOG.info("getStatus: get status");
-        response.resume(Response.ok().build());
+        final StatusDTO status = new StatusDTO(
+                InternalStats.statsNrOfRequestsActive.get(),
+                InternalStats.statsNrOfRequestsActive.get(),
+                InternalStats.statsNrOfEventsInCache.get(),
+                InternalStats.statsNrOfEventsTotal.get());
+        response.resume(Response.ok(status).build());
     }
 }

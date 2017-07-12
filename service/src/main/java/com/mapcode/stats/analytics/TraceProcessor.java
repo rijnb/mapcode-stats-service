@@ -17,6 +17,7 @@ package com.mapcode.stats.analytics;
 
 import akka.actor.ActorSystem;
 import com.google.inject.Inject;
+import com.tomtom.speedtools.time.UTCTime;
 import com.tomtom.speedtools.tracer.mongo.MongoDBTraceStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ public class TraceProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(TraceProcessor.class);
     private static final FiniteDuration INITIAL_DELAY = FiniteDuration.apply(2, TimeUnit.SECONDS);
     private static final FiniteDuration SCHEDULE_DELAY = FiniteDuration.apply(500, TimeUnit.MILLISECONDS);
+    private static final int NR_DAYS_TO_REWIND_AT_START = 30;
 
     @Nonnull
     final ActorSystem actorSystem;
@@ -51,7 +53,7 @@ public class TraceProcessor {
         this.events.addTraceHandler(mapcodeToLatLonTraceHandler);
 
         // Start event processor.
-        events.moveToStart();
+        events.moveTo(UTCTime.now().minusDays(NR_DAYS_TO_REWIND_AT_START));
         scheduleNextPlaybackToEnd(INITIAL_DELAY);
     }
 

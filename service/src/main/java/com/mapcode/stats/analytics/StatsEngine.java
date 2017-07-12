@@ -20,6 +20,7 @@
 
 package com.mapcode.stats.analytics;
 
+import com.mapcode.stats.InternalStats;
 import com.mapcode.stats.analytics.Event.ClientType;
 import com.mapcode.stats.analytics.Event.EventType;
 import com.tomtom.speedtools.geometry.GeoArea;
@@ -46,12 +47,13 @@ public class StatsEngine {
     @Nonnull
     private static final Logger LOG = LoggerFactory.getLogger(StatsEngine.class);
 
-    private static final int NR_ITERATIONS_MIN = 2;
-    private static final int NR_ITERATIONS_MAX = 50;
+    public static final int NR_CLUSTERS_MIN = 1;
+    public static final int NR_CLUSTERS_MAX = 50;
+    public static final int NR_ITERATIONS_MIN = 5;
+    public static final int NR_ITERATIONS_MAX = 25;
 
     // Collection of events (limited in size).
-    private static final int MAX_EVENTS = 2 * 1000 * 1000;
-    private static long totalEvents = 0L;
+    private static final int MAX_EVENTS = 1000 * 1000;
 
     @Nonnull
     private final CircularFifoQueue<Event> events = new CircularFifoQueue<>(MAX_EVENTS);
@@ -71,12 +73,14 @@ public class StatsEngine {
 
         // Lock events collection while adding/removing.
         synchronized (events) {
-            ++totalEvents;
             events.add(event);
+            InternalStats.statsNrOfEventsTotal.incrementAndGet();
+            InternalStats.statsNrOfEventsInCache.set(events.size());
             final DateTime now = UTCTime.now();
             if (last.plusSeconds(10).isBefore(now)) {
                 last = now;
-                LOG.debug("addEvent: total events={} (of which {} cached)", totalEvents, events.size());
+                LOG.debug("addEvent: total events={} (of which {} cached)",
+                        InternalStats.statsNrOfEventsTotal.get(), events.size());
             }
         }
     }
@@ -104,7 +108,10 @@ public class StatsEngine {
         final int nrIterations = (nrIterationsOrDefault != 0) ?
                 nrIterationsOrDefault :
                 MathUtils.limitTo(
-                        NR_ITERATIONS_MAX - ((nrEvents * nrClusters) / 250000),
+                        NR_ITERATIONS_MAX - (int) (
+                                ((((double) nrEvents) / MAX_EVENTS) * (NR_ITERATIONS_MAX - NR_ITERATIONS_MIN)) *
+                                        ((nrClusters / NR_CLUSTERS_MAX) + 1.0)
+                        ),
                         NR_ITERATIONS_MIN, NR_ITERATIONS_MAX);
 
         LOG.debug("getClusters: filtered events, creating {} clusters from {} events in {} iterations...", nrClusters, nrEvents, nrIterations);
