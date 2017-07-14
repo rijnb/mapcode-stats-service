@@ -14,20 +14,29 @@
  * limitations under the License.
  */
 
-/*
- * Copyright (C) 2017, TomTom International BV. All rights reserved.
- */
-
 package com.mapcode.stats;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
+import com.tomtom.speedtools.guice.HasProperties;
 
-public class InternalStats {
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Named;
 
-    // Some internal stats.
-    public static final AtomicInteger statsCachedEvents = new AtomicInteger(0);
-    public static final AtomicInteger statsTotalEvents = new AtomicInteger(0);
-    public static final AtomicLong statsOldestEvent = new AtomicLong(0);
-    public static final AtomicLong statsNewestEvent = new AtomicLong(0);
+public class StatsProperties implements HasProperties {
+
+    @Nonnull
+    private final String apiKey;
+
+    @Inject
+    public StatsProperties(
+            @Named("Mapcode.stats.apiKey") @Nonnull final String apiKey) {
+        assert apiKey != null;
+        this.apiKey = apiKey.trim();
+    }
+
+    @Nonnull
+    public String getApiKey() {
+        return apiKey;
+    }
 }
+

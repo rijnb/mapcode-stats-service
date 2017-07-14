@@ -33,32 +33,18 @@ public interface StatsResource {
     /**
      * Strings used as path or url parameters.
      */
-    static final String PARAM_LAT_SW = "latSW";
-    static final String PARAM_LAT_NE = "latNE";
-    static final String PARAM_LON_SW = "lonSW";
-    static final String PARAM_LON_NE = "lonNE";
-    static final String PARAM_NR_CLUSTERS = "clusters";
-    static final String PARAM_NR_ITERATIONS = "iterations";
-    static final String DEFAULT_NR_CLUSTERS = "10";
-    static final String DEFAULT_NR_ITERATIONS = "0";
+    static final String PARAM_APIKEY = "apiKey";
+    static final String PARAM_COUNT = "count";
+    static final String PARAM_OFFSET = "offset";
+    static final String DEFAULT_OFFSET = "0";
+    static final String DEFAULT_COUNT = "1000";
 
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Path("clusters")
-    void getClustersForWorld(
-            @QueryParam(PARAM_NR_CLUSTERS) @DefaultValue(DEFAULT_NR_CLUSTERS) int paramNrClusters,
-            @QueryParam(PARAM_NR_ITERATIONS) @DefaultValue(DEFAULT_NR_ITERATIONS) int paramNrIterations,
-            @Suspended @Nonnull AsyncResponse response) throws ApiException;
-
-    @GET
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Path("clusters/{" + PARAM_LAT_SW + "},{" + PARAM_LON_SW + "},{" + PARAM_LAT_NE + "},{" + PARAM_LON_NE + '}')
-    void getClustersForBoundingBox(
-            @PathParam(PARAM_LAT_SW) double paramLatSW,
-            @PathParam(PARAM_LON_SW) double paramLonSW,
-            @PathParam(PARAM_LAT_NE) double paramLatNE,
-            @PathParam(PARAM_LON_NE) double paramLonNE,
-            @QueryParam(PARAM_NR_CLUSTERS) @DefaultValue(DEFAULT_NR_CLUSTERS) int paramNrClusters,
-            @QueryParam(PARAM_NR_ITERATIONS) @DefaultValue(DEFAULT_NR_ITERATIONS) int paramNrIterations,
+    @Path("requests")
+    void getMapcodeRequestsForWorld(
+            @QueryParam(PARAM_APIKEY) @DefaultValue("") @Nonnull  String apiKey,
+            @QueryParam(PARAM_OFFSET) @DefaultValue(DEFAULT_OFFSET) int offset,
+            @QueryParam(PARAM_COUNT) @DefaultValue(DEFAULT_COUNT) int count,
             @Suspended @Nonnull AsyncResponse response) throws ApiException;
 }

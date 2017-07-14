@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-/*
- * Copyright (C) 2017, TomTom International BV. All rights reserved.
- */
-
 package com.mapcode.stats;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
+import com.google.inject.Binder;
+import com.google.inject.Module;
 
-public class InternalStats {
+import javax.annotation.Nonnull;
+import javax.inject.Singleton;
 
-    // Some internal stats.
-    public static final AtomicInteger statsCachedEvents = new AtomicInteger(0);
-    public static final AtomicInteger statsTotalEvents = new AtomicInteger(0);
-    public static final AtomicLong statsOldestEvent = new AtomicLong(0);
-    public static final AtomicLong statsNewestEvent = new AtomicLong(0);
+public class StatsModule implements Module {
+
+    @Override
+    public void configure(@Nonnull final Binder binder) {
+        assert binder != null;
+        binder.bind(StatsProperties.class).in(Singleton.class);
+    }
 }

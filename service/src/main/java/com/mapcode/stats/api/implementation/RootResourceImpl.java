@@ -20,6 +20,7 @@ import com.mapcode.stats.InternalStats;
 import com.mapcode.stats.api.RootResource;
 import com.mapcode.stats.api.dto.StatusDTO;
 import com.mapcode.stats.api.dto.VersionDTO;
+import com.tomtom.speedtools.json.Json;
 import com.tomtom.speedtools.maven.MavenProperties;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -105,14 +106,12 @@ public class RootResourceImpl implements RootResource {
     @Override
     public void getStatus(@Suspended @Nonnull final AsyncResponse response) {
         assert response != null;
-        LOG.info("getStatus: get status");
         final StatusDTO status = new StatusDTO(
-                InternalStats.statsActiveRequests.get(),
-                InternalStats.statsTotalRequests.get(),
                 InternalStats.statsCachedEvents.get(),
                 InternalStats.statsTotalEvents.get(),
                 new DateTime(InternalStats.statsOldestEvent.get()),
                 new DateTime(InternalStats.statsNewestEvent.get()));
+        LOG.info("getStatus: status={}", Json.toStringJson(status));
         response.resume(Response.ok(status).build());
     }
 }

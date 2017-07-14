@@ -17,23 +17,15 @@
 package com.mapcode.stats.api.implementation;
 
 import akka.dispatch.Futures;
-import com.mapcode.stats.analytics.Cluster;
+import com.mapcode.stats.StatsProperties;
 import com.mapcode.stats.analytics.StatsEngine;
-import com.mapcode.stats.api.ApiConstants;
 import com.mapcode.stats.api.StatsResource;
-import com.mapcode.stats.api.dto.ClusterDTO;
-import com.mapcode.stats.api.dto.ClusterListDTO;
-import com.mapcode.stats.api.dto.ClustersDTO;
-import com.mapcode.stats.api.dto.PointDTO;
 import com.tomtom.speedtools.apivalidation.exceptions.ApiException;
 import com.tomtom.speedtools.apivalidation.exceptions.ApiIntegerOutOfRangeException;
-import com.tomtom.speedtools.geometry.Geo;
-import com.tomtom.speedtools.geometry.GeoPoint;
-import com.tomtom.speedtools.geometry.GeoRectangle;
+import com.tomtom.speedtools.apivalidation.exceptions.ApiUnauthorizedException;
 import com.tomtom.speedtools.rest.ResourceProcessor;
-import com.tomtom.speedtools.time.UTCTime;
-import com.tomtom.speedtools.utils.MathUtils;
-import org.joda.time.DateTime;
+import org.geojson.Feature;
+import org.geojson.FeatureCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,13 +33,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
-import static com.mapcode.stats.InternalStats.statsActiveRequests;
-import static com.mapcode.stats.InternalStats.statsTotalRequests;
-import static javax.ws.rs.core.Response.status;
 
 /**
  * This class implements the REST API that handles mapcode conversions.
@@ -55,106 +41,52 @@ import static javax.ws.rs.core.Response.status;
 public class StatsResourceImpl implements StatsResource {
     private static final Logger LOG = LoggerFactory.getLogger(StatsResourceImpl.class);
 
-    private static final int HTTP_BUSY_TIMEOUT = 5;                 // If it's busy, just refuse to work...
-    private static final int HTTP_STATUS_TOO_MANY_REQUESTS = 429;   // ...with this code.
-
+    private final StatsProperties statsProperties;
     private final StatsEngine statsEngine;
     private final ResourceProcessor processor;
 
-    // Global lock.
-    private static final Object lock = new Object();
-
     @Inject
     public StatsResourceImpl(
+            @Nonnull final StatsProperties statsProperties,
             @Nonnull final StatsEngine statsEngine,
             @Nonnull final ResourceProcessor processor) {
+        assert statsProperties != null;
         assert statsEngine != null;
         assert processor != null;
+        this.statsProperties = statsProperties;
         this.statsEngine = statsEngine;
         this.processor = processor;
     }
 
     @Override
-    public void getClustersForWorld(
-            final int paramNrClusters,
-            final int paramNrIterations,
-            final @Nonnull AsyncResponse response) throws ApiException {
-        getClustersForBoundingBox(-90.0, -180.0, 90.0, 180.0, paramNrClusters, paramNrIterations, response);
-    }
-
-    @Override
-    public void getClustersForBoundingBox(
-            final double paramLatSW,
-            final double paramLonSW,
-            final double paramLatNE,
-            final double paramLonNE,
-            final int paramNrClusters,
-            final int paramNrIterations,
-            final @Nonnull AsyncResponse response) throws ApiException {
+    public void getMapcodeRequestsForWorld(
+            @Nonnull final String apiKey,
+            final int offset,
+            final int count,
+            @Nonnull final AsyncResponse response) throws ApiException {
         assert response != null;
 
-        processor.process("getClustersForBoundingBox", LOG, response, () -> {
+        processor.process("getMapcodeRequestsForWorld", LOG, response, () -> {
 
-            // Check input parameter.
-            if (!MathUtils.isBetween(paramNrClusters, ApiConstants.API_NR_CLUSTERS_MIN, ApiConstants.API_NR_CLUSTERS_MAX)) {
-                throw new ApiIntegerOutOfRangeException(PARAM_NR_CLUSTERS, paramNrClusters, ApiConstants.API_NR_CLUSTERS_MIN, ApiConstants.API_NR_CLUSTERS_MAX);
+            // Check API key.
+            if (!statsProperties.getApiKey().equals(apiKey)) {
+                throw new ApiUnauthorizedException("Invalid API key");
             }
 
-            // Check input parameter.
-            if (!MathUtils.isBetween(paramNrIterations, ApiConstants.API_NR_ITERATIONS_MIN, ApiConstants.API_NR_ITERATIONS_MAX)) {
-                throw new ApiIntegerOutOfRangeException(PARAM_NR_ITERATIONS, paramNrIterations, ApiConstants.API_NR_ITERATIONS_MIN, ApiConstants.API_NR_ITERATIONS_MAX);
+            // Check value of count.
+            if (count < 0) {
+                throw new ApiIntegerOutOfRangeException(PARAM_COUNT, count, 0, Integer.MAX_VALUE);
             }
-            try {
-                statsActiveRequests.incrementAndGet();
-                statsTotalRequests.incrementAndGet();
+            assert count >= 0;
 
-                // Cap lat and lons.
-                final GeoPoint southWest = new GeoPoint(MathUtils.limitTo(paramLatSW, -90.0, 90.0), MathUtils.limitTo(paramLonSW, -180.0, Geo.LON180));
-                final GeoPoint northEast = new GeoPoint(MathUtils.limitTo(paramLatNE, -90.0, 90.0), MathUtils.limitTo(paramLonNE, -180.0, Geo.LON180));
-                final GeoRectangle area = new GeoRectangle(southWest, northEast);
+            // Copy events.
+            final List<Feature> features = statsEngine.getEvents(count, offset);
+            final FeatureCollection featureCollection = new FeatureCollection();
+            featureCollection.setFeatures(features);
+            response.resume(Response.ok(featureCollection).build());
 
-                /**
-                 * The clustering algorithm takes a lot of resources, like memory. We don't want to run into
-                 * out of memory situations, so we will allow only 1 call at a time, by acquiring a global lock.
-                 * If it's busy, the service simply bails out with "TOO MANY REQUESTS".
-                 */
-                LOG.debug("getClustersForArea: acquiring lock...");
-                final Set<Cluster> clustersForArea;
-                final DateTime beforeLock = UTCTime.now();
-                synchronized (lock) {
-                    LOG.info("getClustersForArea: acquired lock");
-
-                    // Don't even bother doing the clustering if it's busy.
-                    if (beforeLock.plusSeconds(HTTP_BUSY_TIMEOUT).isBeforeNow()) {
-                        response.resume(status(HTTP_STATUS_TOO_MANY_REQUESTS).build());
-                        return Futures.successful(null);
-                    }
-                    LOG.info("getClustersForArea: nrClusters={}, area={}", paramNrClusters, area);
-                    clustersForArea = statsEngine.getClustersForArea(area, paramNrClusters, paramNrIterations);
-                }
-
-                // Other requests may be processed from here on.
-                final Integer totalTotalNrEvents = clustersForArea.stream().map(x -> x.getCount()).reduce(0, Integer::sum);
-
-                final List<ClusterDTO> list = new ArrayList<>();
-                for (final Cluster cluster : clustersForArea) {
-                    final GeoRectangle boundingBox = cluster.getBoundingBox();
-                    list.add(new ClusterDTO(cluster.getCount(),
-                            new PointDTO(boundingBox.getSouthWest()),
-                            new PointDTO(boundingBox.getNorthEast())));
-                }
-                final ClusterListDTO clusters = new ClusterListDTO(list);
-                final ClustersDTO result = new ClustersDTO(clusters.size(), totalTotalNrEvents, clusters, new PointDTO(northEast), new PointDTO(southWest));
-
-                // Validate the DTO before returning it, to make sure it's valid (internal consistency check).
-                result.validate();
-                response.resume(Response.ok(result).build());
-
-                // The response is already set within this method body.
-                return Futures.successful(null);
-            } finally {
-                statsActiveRequests.decrementAndGet();
-            }
+            // The response is already set within this method body.
+            return Futures.successful(null);
         });
     }
 }

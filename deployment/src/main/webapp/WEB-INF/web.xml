@@ -29,6 +29,7 @@
             com.tomtom.speedtools.rest.ServicesModule,
             com.mapcode.stats.analytics.AnalyticsModule,
             com.mapcode.stats.api.ApiModule,
+            com.mapcode.stats.StatsModule,
             com.mapcode.stats.deployment.DeploymentModule
         </param-value>
     </context-param>

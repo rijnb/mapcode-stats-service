@@ -23,40 +23,28 @@ package com.mapcode.stats.analytics;
 import com.mapcode.stats.InternalStats;
 import com.mapcode.stats.analytics.Event.ClientType;
 import com.mapcode.stats.analytics.Event.EventType;
-import com.tomtom.speedtools.geometry.GeoArea;
 import com.tomtom.speedtools.geometry.GeoPoint;
-import com.tomtom.speedtools.geometry.GeoRectangle;
 import com.tomtom.speedtools.time.UTCTime;
-import com.tomtom.speedtools.utils.MathUtils;
-import net.sf.javaml.clustering.Clusterer;
-import net.sf.javaml.clustering.KMeans;
-import net.sf.javaml.core.Dataset;
-import net.sf.javaml.core.DefaultDataset;
-import net.sf.javaml.core.DenseInstance;
-import net.sf.javaml.core.Instance;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
+import org.geojson.Feature;
+import org.geojson.Point;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StatsEngine {
     @Nonnull
     private static final Logger LOG = LoggerFactory.getLogger(StatsEngine.class);
 
-    public static final int NR_CLUSTERS_MIN = 1;
-    public static final int NR_CLUSTERS_MAX = 50;
-    public static final int NR_ITERATIONS_MIN = 5;
-    public static final int NR_ITERATIONS_MAX = 25;
-
     // Collection of events (limited in size).
-    private static final int MAX_EVENTS = 1000 * 1000;
+    private static final int MAX_EVENTS = 2 * 1000 * 1000;
 
     @Nonnull
-    private final CircularFifoQueue<Event> events = new CircularFifoQueue<>(MAX_EVENTS);
+    private final CircularFifoQueue<GeoPoint> points = new CircularFifoQueue<>(MAX_EVENTS);
     private DateTime last = UTCTime.now();
 
     public void addEvent(
@@ -72,80 +60,47 @@ public class StatsEngine {
         final Event event = new Event(time, eventType, point, clientType);
 
         // Lock events collection while adding/removing.
-        synchronized (events) {
-            events.add(event);
+        synchronized (points) {
             InternalStats.statsTotalEvents.incrementAndGet();
-            InternalStats.statsCachedEvents.set(events.size());
-            InternalStats.statsOldestEvent.set(events.peek().getTime().getMillis());
-            InternalStats.statsNewestEvent.set(event.getTime().getMillis());
+            InternalStats.statsCachedEvents.set(points.size());
+            if (points.isEmpty()) {
+                InternalStats.statsOldestEvent.set(time.getMillis());
+            }
+            points.add(point);
+            InternalStats.statsNewestEvent.set(time.getMillis());
             final DateTime now = UTCTime.now();
             if (last.plusSeconds(10).isBefore(now)) {
                 last = now;
                 LOG.debug("addEvent: total events={} (of which {} cached)",
-                        InternalStats.statsTotalEvents.get(), events.size());
+                        InternalStats.statsTotalEvents.get(), points.size());
             }
         }
     }
 
     @Nonnull
-    public Set<Cluster> getClustersForArea(@Nonnull final GeoArea area, final int nrClusters, final int nrIterationsOrDefault) {
-        LOG.info("getClusters: boundingBox={}, nrClusters={}, nrIterations={}, total events={}",
-                area, nrClusters, nrIterationsOrDefault, events.size());
+    public List<Feature> getEvents(final int count, final int offset) {
 
-        // Destination.
-        final Dataset filteredDataset = new DefaultDataset();
+        final List<Feature> result = new ArrayList<>(count);
+        synchronized (points) {
+            // Calculate sub-list to use.
+            final int fromIndex = (offset < 0) ? Math.max(0, points.size() + offset) : Math.min(points.size(), offset);
+            final int toIndex = Math.min(points.size(), fromIndex + count);
+            LOG.debug("getEvents: from={}, to={}", fromIndex, toIndex);
 
-        // Lock events collection while copying.
-        synchronized (events) {
-            events.stream().
-                    filter(event -> area.contains(event.getPoint())).
-                    forEach(event -> {
-                        final DenseInstance instance = new DenseInstance(new double[]{event.getPoint().getLat(), event.getPoint().getLon()});
-                        filteredDataset.add(instance);
-                    });
-        }
-
-        final Set<Cluster> clusters = new HashSet<>();
-        final int nrEvents = filteredDataset.size();
-        final int nrIterations = (nrIterationsOrDefault != 0) ?
-                nrIterationsOrDefault :
-                MathUtils.limitTo(
-                        NR_ITERATIONS_MAX - (int) (
-                                ((((double) nrEvents) / MAX_EVENTS) * (NR_ITERATIONS_MAX - NR_ITERATIONS_MIN)) *
-                                        ((nrClusters / NR_CLUSTERS_MAX) + 1.0)
-                        ),
-                        NR_ITERATIONS_MIN, NR_ITERATIONS_MAX);
-
-        LOG.debug("getClusters: filtered events, creating {} clusters from {} events in {} iterations...", nrClusters, nrEvents, nrIterations);
-        // Need to check if dataset is empty or not.
-        if (!filteredDataset.isEmpty()) {
-
-            // Divide data set into a number of clusters.
-            final Clusterer clusterer = new KMeans(nrClusters, nrIterations);
-            final Dataset[] datasets = clusterer.cluster(filteredDataset);
-
-            for (final Dataset dataset : datasets) {
-                final int count = dataset.size();
-                GeoRectangle boundingBox = null;
-                for (int i = 0; i < dataset.size(); ++i) {
-                    final Instance instance = dataset.instance(i);
-                    final GeoPoint point = new GeoPoint(instance.value(0), instance.value(1));
-                    if (boundingBox == null) {
-                        boundingBox = new GeoRectangle(point, point);
-                    } else {
-                        boundingBox = boundingBox.grow(point);
-                    }
+            int i = 0;
+            for (final GeoPoint point : points) {
+                if (i >= fromIndex) {
+                    final Feature feature = new Feature();
+                    feature.setGeometry(new Point(point.getLon(), point.getLat()));
+                    result.add(feature);
                 }
-                assert boundingBox != null;
-                final Cluster cluster = new Cluster(count, boundingBox);
-                clusters.add(cluster);
+                ++i;
+                if (i >= toIndex) {
+                    break;
+                }
             }
         }
-
-        LOG.debug("getClusters: {} clusters found in {} iterations", clusters.size(), nrIterations);
-        clusters.stream().forEach(cluster -> {
-            LOG.debug("getClusters: | {}, {}", cluster.getCount(), cluster.getBoundingBox());
-        });
-        return clusters;
+        LOG.debug("getEvents: result={}", result.size());
+        return result;
     }
 }

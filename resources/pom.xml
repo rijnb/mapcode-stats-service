@@ -23,7 +23,7 @@
     <parent>
         <groupId>com.mapcode.stats</groupId>
         <artifactId>mapcode-stats-service</artifactId>
-        <version>1.0.12</version>
+        <version>1.0.7</version>
     </parent>
 
     <artifactId>resources</artifactId>

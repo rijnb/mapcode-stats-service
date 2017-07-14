@@ -41,8 +41,7 @@ import javax.annotation.Nonnull;
 public class DeploymentModule extends GuiceConfigurationModule {
 
     public DeploymentModule() {
-        super(
-                "classpath:speedtools.default.properties",      // Default set required by SpeedTools.
+        super("classpath:stats-default.properties",             // Taken from SpeedTools default properties.
                 "classpath:stats.properties",                   // Specific for mapcode stats service.
                 "classpath:stats-secret.properties");           // Secret properties (not in WAR file).
     }

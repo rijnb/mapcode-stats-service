@@ -76,10 +76,11 @@ public class LocalTestServer {
         final ResourceProcessor resourceProcessor = new ResourceProcessor(reactor);
         final StatsEngine statsEngine = new StatsEngine();
         final MavenProperties mavenProperties = new MavenProperties(version);
+        final StatsProperties statsProperties = new StatsProperties("test");
 
         // Add resources.
         server.getDeployment().getResources().add(new RootResourceImpl(mavenProperties));
-        server.getDeployment().getResources().add(new StatsResourceImpl(statsEngine, resourceProcessor));
+        server.getDeployment().getResources().add(new StatsResourceImpl(statsProperties, statsEngine, resourceProcessor));
         server.start();
         LOG.debug("start: Start local server, baseUrl={}", getBaseUrl());
     }

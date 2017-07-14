@@ -69,8 +69,6 @@ public final class StatusDTO extends ApiDTO {
     @Override
     public void validate() {
         validator().start();
-        validator().checkInteger(true, "activeRequests", activeRequests, 0, Integer.MAX_VALUE);
-        validator().checkInteger(true, "totalRequests", totalRequests, 0, Integer.MAX_VALUE);
         validator().checkInteger(true, "cachedEvents", cachedEvents, 0, Integer.MAX_VALUE);
         validator().checkInteger(true, "totalEvents", totalEvents, 0, Integer.MAX_VALUE);
         validator().checkDate(true, "oldestEvent", oldestEvent, ApiConstants.API_DATE_MIN, ApiConstants.API_DATE_MAX);
@@ -79,14 +77,10 @@ public final class StatusDTO extends ApiDTO {
     }
 
     public StatusDTO(
-            final int activeRequests,
-            final int totalRequests,
             final int cachedEvents,
             final int totalEvents,
             @Nonnull final DateTime oldestEvent,
             @Nonnull final DateTime newestEvent) {
-        this.activeRequests = activeRequests;
-        this.totalRequests = totalRequests;
         this.cachedEvents = cachedEvents;
         this.totalEvents = totalEvents;
         this.oldestEvent = oldestEvent;
@@ -98,26 +92,6 @@ public final class StatusDTO extends ApiDTO {
     private StatusDTO() {
         // Default constructor required by JAX-B.
         super();
-    }
-
-    public int getActiveRequests() {
-        beforeGet();
-        return activeRequests;
-    }
-
-    public void setActiveRequests(final int activeRequests) {
-        beforeSet();
-        this.activeRequests = activeRequests;
-    }
-
-    public int getTotalRequests() {
-        beforeGet();
-        return totalRequests;
-    }
-
-    public void setTotalRequests(final int totalRequests) {
-        beforeSet();
-        this.totalRequests = totalRequests;
     }
 
     public int getCachedEvents() {
