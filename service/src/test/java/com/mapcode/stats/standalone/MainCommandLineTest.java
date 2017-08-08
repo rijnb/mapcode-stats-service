@@ -18,7 +18,6 @@ package com.mapcode.stats.standalone;
 
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
@@ -36,7 +35,6 @@ public class MainCommandLineTest {
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
-    @Ignore
     public void testHelp() {
         LOG.info("testHelp");
 
@@ -47,7 +45,6 @@ public class MainCommandLineTest {
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
-    @Ignore
     public void testUnknownArgument() {
         LOG.info("testUnknownArgument");
 
@@ -60,7 +57,6 @@ public class MainCommandLineTest {
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
-    @Ignore
     public void testServer() {
         LOG.info("testServer");
 
