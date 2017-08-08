@@ -6,7 +6,7 @@
 [![License](http://img.shields.io/badge/license-APACHE2-blue.svg)]()
 [![Release](https://img.shields.io/github/release/mapcode-foundation/mapcode-stats-service.svg?maxAge=3600)](https://github.com/mapcode-foundation/mapcode-stats-service/releases)
 
-**Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)**
+**Copyright (C) 2014-2017 Stichting Mapcode Foundation (http://www.mapcode.com)**
 
 This application provides a visualization REST API for the mapcode service statistics.
 It uses the Java Library for Mapcodes extensively. 
