@@ -16,7 +16,6 @@
 
 package com.mapcode.stats;
 
-import akka.actor.ActorSystem;
 import com.mapcode.stats.analytics.StatsEngine;
 import com.mapcode.stats.api.implementation.RootResourceImpl;
 import com.mapcode.stats.api.implementation.StatsResourceImpl;
@@ -54,9 +53,6 @@ public class LocalTestServer {
     }
 
     public void start() {
-
-        // Create an actor system.
-        final ActorSystem actorSystem = ActorSystem.create("test");
 
         // Create a simple ResourceProcessor, required for implementation of REST service using the SpeedTools framework.
         final Reactor reactor = new Reactor() {

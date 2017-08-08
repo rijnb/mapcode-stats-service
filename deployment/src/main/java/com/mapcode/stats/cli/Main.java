@@ -119,7 +119,7 @@ public class Main {
         @Override
         public URLStreamHandler createURLStreamHandler(@Nonnull final String protocol) {
             assert protocol != null;
-            if (protocol.equals("nestedjar")) {
+            if ("nestedjar".equals(protocol)) {
                 return new JarJarURLStreamHandler();
             }
             return null;

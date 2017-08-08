@@ -36,6 +36,7 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("AccessToStaticFieldLockedOnInstance")
 public class StatsEngine {
     @Nonnull
     private static final Logger LOG = LoggerFactory.getLogger(StatsEngine.class);
@@ -57,7 +58,6 @@ public class StatsEngine {
 
         // Create event.
         final GeoPoint point = new GeoPoint(latDeg, lonDeg);
-        final Event event = new Event(time, eventType, point, clientType);
 
         // Lock events collection while adding/removing.
         synchronized (points) {

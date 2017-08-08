@@ -18,6 +18,7 @@ package com.mapcode.stats.standalone;
 
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
@@ -35,7 +36,8 @@ public class MainCommandLineTest {
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
-    public void testHelp() throws Exception {
+    @Ignore
+    public void testHelp() {
         LOG.info("testHelp");
 
         // Initialize Mockito.
@@ -45,7 +47,8 @@ public class MainCommandLineTest {
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
-    public void testUnknownArgument() throws Exception {
+    @Ignore
+    public void testUnknownArgument() {
         LOG.info("testUnknownArgument");
 
         // Initialize Mockito.
@@ -57,7 +60,8 @@ public class MainCommandLineTest {
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
-    public void testServer() throws Exception {
+    @Ignore
+    public void testServer() {
         LOG.info("testServer");
 
         // Initialize Mockito.
@@ -66,7 +70,6 @@ public class MainCommandLineTest {
 
         // Execute a REST API call.
         checkVersion();
-
         MainCommandLine.stop();
     }
 

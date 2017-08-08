@@ -19,22 +19,18 @@ import akka.actor.ActorSystem;
 import com.google.inject.Inject;
 import com.tomtom.speedtools.time.UTCTime;
 import com.tomtom.speedtools.tracer.mongo.MongoDBTraceStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import scala.concurrent.duration.FiniteDuration;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.TimeUnit;
 
 public class TraceProcessor {
-    @Nonnull
-    private static final Logger LOG = LoggerFactory.getLogger(TraceProcessor.class);
     private static final FiniteDuration INITIAL_DELAY = FiniteDuration.apply(2, TimeUnit.SECONDS);
     private static final FiniteDuration SCHEDULE_DELAY = FiniteDuration.apply(500, TimeUnit.MILLISECONDS);
     private static final int NR_DAYS_TO_REWIND_AT_START = 21;
 
     @Nonnull
-    final ActorSystem actorSystem;
+    private final ActorSystem actorSystem;
 
     @Nonnull
     private final MongoDBTraceStream events;

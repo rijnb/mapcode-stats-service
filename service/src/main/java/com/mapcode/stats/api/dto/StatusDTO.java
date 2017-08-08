@@ -42,12 +42,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class StatusDTO extends ApiDTO {
 
-    @XmlElement(name = "activeRequests")
-    private int activeRequests;
-
-    @XmlElement(name = "totalRequests")
-    private int totalRequests;
-
     @XmlElement(name = "cachedEvents")
     private int cachedEvents;
 

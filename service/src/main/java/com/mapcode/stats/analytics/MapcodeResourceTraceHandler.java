@@ -89,7 +89,6 @@ public final class MapcodeResourceTraceHandler implements Tracer {
             final Mapcode mapcodeShort = (territory == null) ?
                     MapcodeCodec.encodeToInternational(point.getLatDeg(), point.getLonDeg()) :
                     MapcodeCodec.encodeToShortest(point.getLatDeg(), point.getLonDeg(), territory);
-            final String id = mapcodeLong.getCode(8);
             LOG.trace("eventMapcodeToLatLon: latDeg={}, londeg={}, mapcode={}|{}, territory={}, type={}, alphabet={}, include={}, now={}, client={}",
                     point.getLatDeg(), point.getLonDeg(), mapcodeShort, mapcodeLong, territory, now, client);
             statsEngine.addEvent(now, EventType.MAPCODE_TO_LATLON, point.getLatDeg(), point.getLonDeg(), fromString(client));
