@@ -10,8 +10,8 @@ install: mvn install -DskipTests -Dgpg.skip -Ptest
 script:
     - mvn verify -Dgpg.skip -Ptest
 
-after_success:
-    - mvn coveralls:report -Dgpg.skip -Ptest
+# after_success:
+#     - mvn coveralls:report -Dgpg.skip -Ptest
 
 cache:
   directories:
