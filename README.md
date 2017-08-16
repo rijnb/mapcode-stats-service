@@ -14,6 +14,11 @@ It uses the Java Library for Mapcodes extensively.
 
 ### Build and Run
 
+First, make sure you have the correct file encoding (UTF8) set for Java on your system.
+Include this environment variable in your `.profile` or `.bashrc`:
+
+    export JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF8"
+
 The service always runs from a WAR file.
 To build the WAR file, type
 
