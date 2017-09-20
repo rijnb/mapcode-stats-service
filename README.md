@@ -179,6 +179,10 @@ Normally, one of our developers should be able to comment on them and fix.
 
 ## Release Notes
 
+### 2.4.5.0
+
+* Moved to versioning scheme of Mapcode Java library.
+
 ### 0.0.1
  
 * Initial version.
