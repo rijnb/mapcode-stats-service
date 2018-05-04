@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 
 @SuppressWarnings({"UseOfSystemOutOrSystemErr", "ConstantConditions"})
-public class MainCommandLine {
+public final class MainCommandLine {
     private static final String CMD_HELP = "--help";
     private static final String CMD_SILENT = "--silent";
     private static final String CMD_DEBUG = "--debug";
@@ -59,7 +59,7 @@ public class MainCommandLine {
         // Prevent instantiation.
     }
 
-    public static void execute(final String[] args) {
+    public static void execute(final String... args) {
         int port = DEFAULT_PORT;
         String command = null;
         boolean debug = false;

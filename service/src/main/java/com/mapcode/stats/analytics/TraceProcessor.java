@@ -60,8 +60,6 @@ public class TraceProcessor {
     }
 
     private void scheduleNextPlaybackToEnd(@Nonnull final FiniteDuration duration) {
-        actorSystem.scheduler().scheduleOnce(duration, () -> {
-            playbackToEndOnce();
-        }, actorSystem.dispatcher());
+        actorSystem.scheduler().scheduleOnce(duration, this::playbackToEndOnce, actorSystem.dispatcher());
     }
 }

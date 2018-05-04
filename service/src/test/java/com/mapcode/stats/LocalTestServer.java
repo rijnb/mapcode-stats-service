@@ -32,7 +32,7 @@ import scala.concurrent.ExecutionContext;
 
 import javax.annotation.Nonnull;
 
-@SuppressWarnings("JUnitTestMethodWithNoAssertions")
+@SuppressWarnings({"JUnitTestMethodWithNoAssertions", "JUnitTestCaseWithNoTests"})
 public class LocalTestServer {
     private static final Logger LOG = LoggerFactory.getLogger(LocalTestServer.class);
 

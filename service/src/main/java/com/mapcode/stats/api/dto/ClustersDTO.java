@@ -63,7 +63,9 @@ public final class ClustersDTO extends ApiDTO {
     public void validate() {
         validator().start();
         final int calcTotalNrClusters = (clusters == null) ? 0 : clusters.size();
-        final Integer calcTotalNrEvents = (clusters == null) ? 0 : clusters.stream().map(x -> x.getNrEvents()).reduce(0, Integer::sum);
+        final Integer calcTotalNrEvents = (clusters == null) ? 0 : clusters.stream().
+                map(ClusterDTO::getNrEvents).
+                reduce(0, Integer::sum);
         validator().checkInteger(true, "totalNrClusters", totalNrClusters, calcTotalNrClusters, calcTotalNrClusters);
         validator().checkInteger(true, "totalNrEvents", totalNrEvents, calcTotalNrEvents, calcTotalNrEvents);
         validator().checkNotNullAndValidateAll(false, "clusters", clusters);

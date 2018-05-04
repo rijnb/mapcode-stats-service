@@ -81,7 +81,7 @@ public final class MapcodeResourceTraceHandler implements Tracer {
     @Override
     public void eventMapcodeToLatLon(@Nonnull final String code, @Nullable final Territory territory, @Nonnull final DateTime now,
                                      @Nullable final String client) {
-        LOG.trace("eventMapcodeToLatLon: mapcode={}, territory={}, now={}, client={}", code, territory, now);
+        LOG.trace("eventMapcodeToLatLon: mapcode={}, territory={}, now={}, client={}", code, territory, now, client);
         final Point point;
         try {
             point = (territory == null) ? MapcodeCodec.decode(code) : MapcodeCodec.decode(code, territory);
@@ -89,7 +89,7 @@ public final class MapcodeResourceTraceHandler implements Tracer {
             final Mapcode mapcodeShort = (territory == null) ?
                     MapcodeCodec.encodeToInternational(point.getLatDeg(), point.getLonDeg()) :
                     MapcodeCodec.encodeToShortest(point.getLatDeg(), point.getLonDeg(), territory);
-            LOG.trace("eventMapcodeToLatLon: latDeg={}, londeg={}, mapcode={}|{}, territory={}, type={}, alphabet={}, include={}, now={}, client={}",
+            LOG.trace("eventMapcodeToLatLon: latDeg={}, londeg={}, mapcode={}|{}, territory={}, now={}, client={}",
                     point.getLatDeg(), point.getLonDeg(), mapcodeShort, mapcodeLong, territory, now, client);
             statsEngine.addEvent(now, EventType.MAPCODE_TO_LATLON, point.getLatDeg(), point.getLonDeg(), fromString(client));
         } catch (final UnknownMapcodeException ignored) {

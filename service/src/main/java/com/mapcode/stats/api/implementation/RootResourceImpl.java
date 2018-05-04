@@ -79,7 +79,7 @@ public class RootResourceImpl implements RootResource {
     @Override
     @Nonnull
     public String getHelpHTML() {
-        LOG.info("getHelpHTML: show help page", mavenProperties.getPomVersion());
+        LOG.info("getHelpHTML: show help page, version={}", mavenProperties.getPomVersion());
         return "<html><pre>\n" +
                 "MAPCODE STATS API (" + mavenProperties.getPomVersion() + ")\n" +
                 "-----------------\n\n" +

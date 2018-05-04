@@ -42,7 +42,7 @@ public class StatsEngine {
     private static final Logger LOG = LoggerFactory.getLogger(StatsEngine.class);
 
     // Collection of events (limited in size).
-    private static final int MAX_EVENTS = 1 * 1000 * 1000;
+    private static final int MAX_EVENTS = 1000000;
 
     @Nonnull
     private final CircularFifoQueue<GeoPoint> points = new CircularFifoQueue<>(MAX_EVENTS);
