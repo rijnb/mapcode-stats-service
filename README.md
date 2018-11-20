@@ -1,10 +1,10 @@
 # README for Mapcode REST API Web Services
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8911cd282272497d9e5047887f64a270)](https://www.codacy.com/app/rijnb/mapcode-stats-service?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=rijnb/mapcode-stats-service&amp;utm_campaign=Badge_Grade)
-[![Build Status](https://img.shields.io/travis/rijnb/mapcode-stats-service.svg?maxAge=3600&branch=master)](https://travis-ci.org/mapcode-foundation/mapcode-stats-service)
-[![Coverage Status](https://coveralls.io/repos/github/rijnb/mapcode-stats-service/badge.svg?branch=master&maxAge=3600)](https://coveralls.io/github/mapcode-foundation/mapcode-stats-service?branch=master)
+[![Build Status](https://img.shields.io/travis/rijnb/mapcode-stats-service.svg?maxAge=3600&branch=master)](https://travis-ci.org/rijnb/mapcode-stats-service)
+[![Coverage Status](https://coveralls.io/repos/github/rijnb/mapcode-stats-service/badge.svg?branch=master&maxAge=3600)](https://coveralls.io/github/rijnb/mapcode-stats-service?branch=master)
 [![License](http://img.shields.io/badge/license-APACHE2-blue.svg)]()
-[![Release](https://img.shields.io/github/release/rijnb/mapcode-stats-service.svg?maxAge=3600)](https://github.com/mapcode-foundation/mapcode-stats-service/releases)
+[![Release](https://img.shields.io/github/release/rijnb/mapcode-stats-service.svg?maxAge=3600)](https://github.com/rijnb/mapcode-stats-service/releases)
 
 **Copyright (C) 2014-2017 Stichting Mapcode Foundation (http://www.mapcode.com)**
 
