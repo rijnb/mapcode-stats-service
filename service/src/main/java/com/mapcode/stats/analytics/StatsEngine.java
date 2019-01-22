@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2018, Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2016-2019, Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 /*
- * Copyright (C) 2017, TomTom International BV. All rights reserved.
+ * Copyright (C) 2019, TomTom International BV. All rights reserved.
  */
 
 package com.mapcode.stats.analytics;
