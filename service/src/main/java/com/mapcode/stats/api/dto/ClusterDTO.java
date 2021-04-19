@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019, Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2016-2021, Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,4 +99,3 @@ public final class ClusterDTO extends ApiDTO {
         this.northEast = northEast;
     }
 }
-
