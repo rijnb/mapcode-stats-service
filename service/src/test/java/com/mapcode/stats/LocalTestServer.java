@@ -22,7 +22,7 @@ import com.mapcode.stats.api.implementation.StatsResourceImpl;
 import com.tomtom.speedtools.maven.MavenProperties;
 import com.tomtom.speedtools.rest.Reactor;
 import com.tomtom.speedtools.rest.ResourceProcessor;
-import com.tomtom.speedtools.testutils.akka.SimpleExecutionContext;
+import com.tomtom.speedtools.testutils.SimpleExecutionContext;
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 import org.joda.time.DateTime;
 import org.junit.After;
