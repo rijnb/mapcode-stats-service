@@ -53,18 +53,7 @@ public class RootResourceImpl implements RootResource {
             "GET /stats/version Returns the software version.\n" +
             "GET /stats/status  Returns 200 if the service OK.\n\n" +
 
-            "GET /stats/clusters/[?clusters={nrClusters}]\n" +
-            "GET /stats/clusters/{latSW},{lonSW},{latNE},{lonNE}[?clusters={nrClusters}][&iterations={nrIterations}]\n" +
-            "                   Returns statistics for the entire world, or for a bounding box specified\n" +
-            "                   by its South-West and North-East corner coordinates.\n\n" +
-
-            "                   Allowed ranges:\n" +
-            "                       lat(itude) :  -90 ..  90\n" +
-            "                       lon(gitude): -180 .. 180\n" +
-            "                       lon(gitude): -180 .. 180\n\n" +
-
-            "                   nrClusters  : total number of cluster to divide events in.\n" +
-            "                   nrIterations: number of iterations for clustering (0 = automatic).\n";
+            "GET /stats/requests/?apiKey={apiKey}[&offset={offset}][&count={count}]\n";
 
     private final MavenProperties mavenProperties;
 

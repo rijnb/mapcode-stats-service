@@ -45,6 +45,8 @@ public class StatsResourceImpl implements StatsResource {
     private final StatsEngine statsEngine;
     private final ResourceProcessor processor;
 
+    private final int COUNT_MAX = 100000;
+
     @Inject
     public StatsResourceImpl(
             @Nonnull final StatsProperties statsProperties,
@@ -74,8 +76,8 @@ public class StatsResourceImpl implements StatsResource {
             }
 
             // Check value of count.
-            if (count < 0) {
-                throw new ApiIntegerOutOfRangeException(PARAM_COUNT, count, 0, Integer.MAX_VALUE);
+            if ((count < 0) || (count > COUNT_MAX)) {
+                throw new ApiIntegerOutOfRangeException(PARAM_COUNT, count, 0, COUNT_MAX);
             }
             assert count >= 0;
 
